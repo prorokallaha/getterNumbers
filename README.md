@@ -89,14 +89,14 @@ make docker_build
 ```
 Add migrations:
 ```
-docker-compose run --rm migrations
+docker-compose run --rm migrate
 ```
 ```
 make docker_up
 ```
 ## Windows:
 ```
-docker-compose build && docker-compose run --rm migrations && docker-compose up -d
+docker-compose build && docker-compose run --rm migrate && docker-compose up -d
 ```
 ## ENV_FILE
 First of all rename your `.env_example` to `.env`
