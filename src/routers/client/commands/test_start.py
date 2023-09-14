@@ -13,7 +13,6 @@ from src.utils.interactions import Chat, PaginationMediator
 @client_router.message(Command(commands=('start',), ignore_mention=True))
 async def start(
     message: types.Message, 
-    state: FSMContext, 
     chat: Chat,
     pagination: PaginationMediator
 ) -> None:

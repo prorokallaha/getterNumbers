@@ -19,10 +19,11 @@ from src.routers import router
 from src.common.middlewares import (
     DatabaseMiddleware, 
     TrottlingMiddleware,
-    ErrorMiddlware,
+    ErrorMiddleware,
+    ChatMiddleware,
 )
 from src.common.middlewares.i18n import simple_locale_middleware
-from src.utils.interactions import Chat, PaginationMediator
+from src.utils.interactions import PaginationMediator
 
 
 async def on_startup(bot: Bot) -> None:
@@ -49,13 +50,17 @@ def register_middlewares(
         trottle = TrottlingMiddleware(storage)
         router.message.outer_middleware(trottle)
         router.callback_query.outer_middleware(trottle)
-    error = ErrorMiddlware()
+
+    error = ErrorMiddleware()
+    chat = ChatMiddleware()
     db_middleware = DatabaseMiddleware(engine)
     simple_locale_middleware.setup(router)
     router.message.middleware.register(db_middleware)
     router.callback_query.middleware.register(db_middleware)
     router.message.outer_middleware.register(error)
     router.callback_query.outer_middleware.register(error)
+    router.message.outer_middleware.register(chat)
+    router.callback_query.outer_middleware.register(chat)
 
 
 async def main() -> None:
@@ -71,7 +76,6 @@ async def main() -> None:
     await dp.start_polling(
         bot, 
         allowed_updates=dp.resolve_used_update_types(),
-        chat=Chat(),
         pagination=PaginationMediator()
     )
 

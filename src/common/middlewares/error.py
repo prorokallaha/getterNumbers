@@ -8,7 +8,7 @@ from src.common.middlewares.i18n import gettext as _
 
 
 
-class ErrorMiddlware(BaseMiddleware):
+class ErrorMiddleware(BaseMiddleware):
     
     async def __call__(
             self, 

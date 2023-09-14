@@ -1,13 +1,16 @@
-from typing import Dict, Any
+from typing import Dict, Tuple
 
 from src.common.middlewares.i18n import gettext as _
 
 
-def test_button() -> Dict[str, str]:
+def test_button() -> Tuple[Dict[str, str], ...]:
     '''
     We can transalate our inline button as well, it'll we traslated right it is called
     '''
-    return {'text': _('test'), 'callback_data': 'test'} 
+    return (
+        {'text': _('test'), 'callback_data': 'test'},
+        {'text': _('Inner Chat'), 'callback_data': 'inner_chat_test'},
+    )
 
 
 def back_button() -> Dict[str, str]:

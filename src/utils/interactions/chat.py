@@ -3,6 +3,7 @@ from typing import (
     Any,
     Optional,
     Union,
+    List,
 )
 
 from pydantic import BaseModel
@@ -28,30 +29,31 @@ class Chat:
     def __init__(self) -> None:
         self.users: Dict[int, Any] = {}
         
-
     def get_last_message(
             self, user_id: int
     ) -> Union[types.Message, DefaultMessage]:
         
-        message = (
-            self.users.get(user_id, {}).get('message') 
-            or 
-            DefaultMessage()
-        )
-        self.clear(user_id)
-        return message
-        
+        last_message: List[Union[types.Message, DefaultMessage]] 
+        last_message = self.users.get(user_id, [])
 
+        if len(last_message) <= 1:
+            return DefaultMessage()
+        
+        last_message.pop() 
+        return last_message[-1]
+      
+        
     def set_message(
             self, 
             user_id: int, 
             message: types.Message,
-            start_message: bool = False
+            start_message: bool = False,
+            replace_last: bool = False
     ) -> None:
         
-        self.users[user_id] = {'message': message, 'flag': start_message}
+        stack = self.users.get(user_id, [])
+        if replace_last and stack:
+            stack.pop()
+        stack.append(message)
+        self.users[user_id] = stack if not start_message else [message]
     
-    def clear(self, user_id: int) -> None:
-
-        if self.users.get(user_id, {}).get('flag'):
-            self.users.pop(user_id, None)

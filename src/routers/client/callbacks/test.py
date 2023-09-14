@@ -18,7 +18,7 @@ from src.utils.interactions import (
 @client_router.callback_query(F.data == 'test')
 async def test_button(
     call: types.CallbackQuery, pagination: PaginationMediator
-) -> None:
+) -> types.Message:
     
     await safe_delete_message(call)
     pagination.add(call.from_user.id, list(range(100)), _(TEST_PAGINATION_MESSAGE))
@@ -27,7 +27,8 @@ async def test_button(
     buttons += [back_button()]
     if buttons:
         buttons += [next_pagination_button()]
-    await call.message.answer(
+    msg = await call.message.answer(
         data.text,
         reply_markup=build_markup(buttons)
     )
+    return msg
