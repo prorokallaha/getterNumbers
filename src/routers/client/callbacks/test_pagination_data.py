@@ -20,7 +20,7 @@ async def back_callback(
     await safe_delete_message(call)
     data = call.data.split(':')[-1]
     await call.message.answer(
-        text=_(f'Your number of test-data: {data}. Deal with it'), # type: ignore
+        text=_(f'Your number of test-data: {data}. Deal with it'),
         reply_markup=build_markup(back_button())
     )
     

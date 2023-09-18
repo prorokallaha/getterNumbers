@@ -4,13 +4,14 @@ from typing import (
     Any,
     List,
     Optional,
+    Callable,
 )
 
 
 DEFAULT_PAGINATION_LIMIT: Final[int] = 10
 
 
-class Pagination:
+class InMemoryPagination:
 
     def __init__(self, data: List[Any], text: str) -> None:
         self.data = data
@@ -39,7 +40,6 @@ class Pagination:
         
         return True
         
-
     def next(self) -> List[Any]:
         
         end = self._page + 10
@@ -68,12 +68,12 @@ class Pagination:
 class PaginationMediator:
 
     def __init__(self) -> None:
-        self.data: Dict[int, Pagination] = {}
+        self.data: Dict[int, InMemoryPagination] = {}
 
     def add(self, user_id: int, data: List[Any], text: str) -> None:
-        self.data[user_id] = Pagination(data, text)
+        self.data[user_id] = InMemoryPagination(data, text)
     
-    def get(self, user_id: int) -> Optional[Pagination]:
+    def get(self, user_id: int) -> Optional[InMemoryPagination]:
         return self.data.get(user_id)
     
     def clear(self, user_id: int) -> None:
