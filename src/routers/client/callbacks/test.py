@@ -24,9 +24,10 @@ async def test_button(
     pagination.add(call.from_user.id, list(range(100)), _(TEST_PAGINATION_MESSAGE))
     data = pagination.get(call.from_user.id)
     buttons = [pagination_data_button(str(i), str(i)) for i in data.next()]
-    buttons += [back_button()]
     if buttons:
-        buttons += [next_pagination_button()]
+        buttons += [back_button(), next_pagination_button()]
+    else:
+        buttons += [back_button()]
     msg = await call.message.answer(
         data.text,
         reply_markup=build_markup(buttons)
