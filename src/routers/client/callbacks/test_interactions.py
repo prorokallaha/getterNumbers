@@ -15,7 +15,6 @@ from src.utils.buttons import (
 from src.utils.interactions import (
     PaginationMediator,
     Chat, 
-    safe_delete_message,
     safe_edit_message,
 )
 
@@ -31,8 +30,8 @@ async def back_callback(
     last_message = chat.get_last_message(call.from_user.id)
     pagination.clear(call.from_user.id)
 
-    await safe_delete_message(call)
-    await call.message.answer(
+    await safe_edit_message(
+        call,
         text=last_message.text, # type: ignore
         reply_markup=last_message.reply_markup
     )

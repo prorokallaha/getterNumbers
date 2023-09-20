@@ -1,5 +1,7 @@
 from typing import (
     Any, 
+    cast,
+    Final,
     Dict, 
     TypeVar,
     Iterable, 
@@ -16,7 +18,9 @@ from sqlalchemy import (
     insert, 
     update, 
     delete, 
-    ColumnElement
+    func,
+    exists,
+    ColumnExpressionArgument,
 )
 
 from src.database.interfaces.repositories.crud import AbstractCRUDRepository
@@ -24,6 +28,7 @@ from src.database.models.base import Base
 
 
 Model = TypeVar('Model', bound=Base)
+ASTERISK: Final[str] = '*'
 
 
 class CRUDRepository(AbstractCRUDRepository[Model]):
@@ -56,7 +61,7 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
     
     async def select(
             self, 
-            *clauses: ColumnElement[bool], 
+            *clauses: ColumnExpressionArgument[bool], 
     ) -> Optional[Model]:
         
         stmt = select(self.model).where(*clauses)
@@ -65,7 +70,7 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
     
     async def select_many(
             self, 
-            *clauses: ColumnElement[bool], 
+            *clauses: ColumnExpressionArgument[bool], 
             offset: Optional[int] = None, 
             limit: Optional[int] = None, 
     ) -> Sequence[Model]:
@@ -79,7 +84,7 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
         
         return (await self._session.execute(stmt)).scalars().all()
     
-    async def update(self, *clauses: ColumnElement[bool], **values: Dict[str, Any]) -> Sequence[Model]:
+    async def update(self, *clauses: ColumnExpressionArgument[bool], **values: Dict[str, Any]) -> Sequence[Model]:
         
         stmt = (
             update(self.model)
@@ -96,7 +101,7 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
         
         return (await self._session.execute(update(self.model), params))
 
-    async def delete(self, *clauses: ColumnElement[bool]) -> Sequence[Model]:
+    async def delete(self, *clauses: ColumnExpressionArgument[bool]) -> Sequence[Model]:
         
         stmt = (
             delete(self.model)
@@ -105,3 +110,30 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
         )
         
         return (await self._session.execute(stmt)).scalars().all()
+    
+    async def exists(
+            self, *clauses: ColumnExpressionArgument[bool]
+    ) -> bool:
+        
+        stmt = (
+            exists(
+                select(self.model)
+                .where(*clauses)
+            )
+            .select()
+
+        )
+        return cast(bool, await self._session.scalar(stmt))
+    
+    async def count(
+            self,
+            *clauses: ColumnExpressionArgument[bool]
+    ) -> int:
+        
+        stmt = (
+            select(func.count(ASTERISK))
+            .where(*clauses)
+            .select_from(self.model)
+        )
+
+        return cast(int, await self._session.scalar(stmt))

@@ -1,3 +1,5 @@
+from typing import Union
+
 from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 from aiogram import types, F
@@ -25,10 +27,10 @@ from src.utils.interactions import (
 async def inner_chat_callback(
     call: types.CallbackQuery,
     chat: Chat
-) -> types.Message:
+) -> Union[types.Message, bool]:
     
-    await safe_delete_message(call)
-    msg = await call.message.answer(
+    msg = await safe_edit_message(
+        call,
         'This is inner chat 1',
         reply_markup=build_markup(
             [
@@ -44,10 +46,10 @@ async def inner_chat_callback(
 async def inner_chat_2_callback(
     call: types.CallbackQuery,
     chat: Chat
-) -> types.Message:
+) -> Union[types.Message, bool]:
     
-    await safe_delete_message(call)
-    msg = await call.message.answer(
+    msg = await safe_edit_message(
+        call,
         'This is inner chat 2',
         reply_markup=build_markup(
             [
@@ -63,10 +65,10 @@ async def inner_chat_2_callback(
 async def inner_chat_3_callback(
     call: types.CallbackQuery,
     chat: Chat
-) -> types.Message:
+) -> Union[types.Message, bool]:
     
-    await safe_delete_message(call)
-    msg = await call.message.answer(
+    msg = await safe_edit_message(
+        call,
         'This is inner chat 3',
         reply_markup=build_markup(
             [
@@ -82,10 +84,10 @@ async def inner_chat_3_callback(
 async def inner_chat_4_callback(
     call: types.CallbackQuery,
     chat: Chat
-) -> types.Message:
+) -> Union[types.Message, bool]:
     
-    await safe_delete_message(call)
-    msg = await call.message.answer(
+    msg = await safe_edit_message(
+        call,
         'This is inner chat 4',
         reply_markup=build_markup(
             [

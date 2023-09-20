@@ -17,11 +17,11 @@ from src.database.converters import convert_user_model_to_dto
 
 
 class UserRepository(
-    BaseRepository, 
+    BaseRepository[User], 
     Repository[int, UserDTO, UserCreate, UserUpdate]
 ):
 
-    model: ClassVar[Type[User]] = User
+    model: Type[User] = User
 
     async def create(self, query: UserCreate) -> Optional[UserDTO]:
         result = await self._crud.create(**query.model_dump(exclude_none=True))
