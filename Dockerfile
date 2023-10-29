@@ -6,5 +6,4 @@ RUN apt-get update && \
     pip install --upgrade pip
 COPY . .
 WORKDIR /usr/src/project/
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+RUN pip install -r requirements.txt
