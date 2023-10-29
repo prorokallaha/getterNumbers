@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional, Any
+from typing import Optional, Any, cast
 
 from sqlalchemy.ext.asyncio import AsyncSession
-
 
 from src.database.core.unit_of_work import UnitOfWork
 from src.database.core.connection import async_session
@@ -31,4 +30,4 @@ class Database:
         
     @property
     def user(self) -> UserRepository:
-        return self._mediator.userrepository # type: ignore
+        return cast(UserRepository, self._mediator.userrepository)
