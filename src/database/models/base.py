@@ -31,7 +31,9 @@ class Base(DeclarativeBase):
         return f'{type(self).__name__}({params})'
     
     def as_dict(self) -> Dict[str, Any]:
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {
+            attr:value for attr, value in self.__dict__.items() if not attr.startswith('_')
+        }
     
     
 class ModelWithID:

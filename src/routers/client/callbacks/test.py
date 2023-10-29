@@ -6,7 +6,7 @@ from src.routers.client.router import client_router
 from src.utils.text import TEST_PAGINATION_MESSAGE
 from src.common.middlewares.i18n import gettext as _
 from src.common.keyboards import build_markup
-from src.utils.buttons import (
+from src.common.keyboards.buttons import (
     pagination_data_button, 
     next_pagination_button, 
     back_button,
@@ -22,9 +22,9 @@ async def test_button(
     call: types.CallbackQuery, pagination: PaginationMediator
 ) -> Union[types.Message, bool]:
     
-    pagination.add(call.from_user.id, list(range(100)), _(TEST_PAGINATION_MESSAGE))
+    pagination.add(call.from_user.id, list(range(100)), _(TEST_PAGINATION_MESSAGE), pagination_data_button)
     data = pagination.get(call.from_user.id)
-    buttons = [pagination_data_button(str(i), str(i)) for i in data.next()]
+    buttons = [pagination_data_button((str(i), str(i))) for i in data.next()]
     if buttons:
         buttons += [back_button(), next_pagination_button()]
     else:

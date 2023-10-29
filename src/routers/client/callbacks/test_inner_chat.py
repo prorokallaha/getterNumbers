@@ -1,32 +1,21 @@
 from typing import Union
 
-from aiogram.filters.command import Command
-from aiogram.fsm.context import FSMContext
 from aiogram import types, F
 
 from src.routers.client.router import client_router
-from src.utils.text import TEST_PAGINATION_MESSAGE
 from src.common.middlewares.i18n import gettext as _
 from src.common.keyboards import build_markup
-from src.utils.buttons import (
-    pagination_data_button, 
-    next_pagination_button, 
-    previous_pagination_button,
+from src.common.keyboards.buttons import (
     back_button,
 )
 from src.utils.interactions import (
-    PaginationMediator,
-    Chat, 
-    safe_delete_message,
     safe_edit_message,
 )
-
 
 
 @client_router.callback_query(F.data == 'inner_chat_test')
 async def inner_chat_callback(
     call: types.CallbackQuery,
-    chat: Chat
 ) -> Union[types.Message, bool]:
     
     msg = await safe_edit_message(
@@ -45,7 +34,6 @@ async def inner_chat_callback(
 @client_router.callback_query(F.data == 'inner_chat_test_2')
 async def inner_chat_2_callback(
     call: types.CallbackQuery,
-    chat: Chat
 ) -> Union[types.Message, bool]:
     
     msg = await safe_edit_message(
@@ -64,7 +52,6 @@ async def inner_chat_2_callback(
 @client_router.callback_query(F.data == 'inner_chat_test_3')
 async def inner_chat_3_callback(
     call: types.CallbackQuery,
-    chat: Chat
 ) -> Union[types.Message, bool]:
     
     msg = await safe_edit_message(
@@ -83,7 +70,6 @@ async def inner_chat_3_callback(
 @client_router.callback_query(F.data == 'inner_chat_test_4')
 async def inner_chat_4_callback(
     call: types.CallbackQuery,
-    chat: Chat
 ) -> Union[types.Message, bool]:
     
     msg = await safe_edit_message(

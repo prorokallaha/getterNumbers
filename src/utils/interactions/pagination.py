@@ -13,9 +13,10 @@ DEFAULT_PAGINATION_LIMIT: Final[int] = 10
 
 class InMemoryPagination:
 
-    def __init__(self, data: List[Any], text: str) -> None:
+    def __init__(self, data: List[Any], text: str, func: Callable[..., Any]) -> None:
         self.data = data
         self.text = text
+        self.func = func
         self._page = 0
         self._limit = DEFAULT_PAGINATION_LIMIT
 
@@ -70,8 +71,8 @@ class PaginationMediator:
     def __init__(self) -> None:
         self.data: Dict[int, InMemoryPagination] = {}
 
-    def add(self, user_id: int, data: List[Any], text: str) -> None:
-        self.data[user_id] = InMemoryPagination(data, text)
+    def add(self, user_id: int, data: List[Any], text: str, func: Callable[..., Any]) -> None:
+        self.data[user_id] = InMemoryPagination(data, text, func)
     
     def get(self, user_id: int) -> Optional[InMemoryPagination]:
         return self.data.get(user_id)

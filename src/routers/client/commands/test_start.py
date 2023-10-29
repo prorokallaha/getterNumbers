@@ -1,10 +1,9 @@
 from aiogram.filters.command import Command
-from aiogram.fsm.context import FSMContext
 from aiogram import types
 
 from src.routers.client.router import client_router
 from src.utils.text import START_COMMAND_MESSAGE
-from src.utils.buttons import test_button
+from src.common.keyboards.buttons import test_button
 from src.common.middlewares.i18n import gettext as _
 from src.common.keyboards import build_markup
 from src.utils.interactions import Chat, PaginationMediator

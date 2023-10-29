@@ -41,7 +41,6 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
 
         stmt = (
             insert(self.model)
-            .prefix_with('OR IGNORE')
             .values(**values)
             .returning(self.model)
         )
@@ -52,7 +51,6 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
 
         stmt = (
             insert(self.model)
-            .prefix_with('OR IGNORE')
             .returning(self.model)
         )
         params = [model if isinstance(model, dict) else model.as_dict() for model in data]
@@ -137,3 +135,4 @@ class CRUDRepository(AbstractCRUDRepository[Model]):
         )
 
         return cast(int, await self._session.scalar(stmt))
+    

@@ -29,16 +29,16 @@ def is_list_or_tuple_of_type(
 
 def build_buttons(
         buttons: List[Union[types.KeyboardButton, types.InlineKeyboardButton]],
-        step: int = DEFAULT_STEP
+        sep: int = DEFAULT_STEP
 ) -> List[List[Union[types.KeyboardButton, types.InlineKeyboardButton]]]:
-    return [buttons[n:n + step] for n in range(0, len(buttons), step)]
+    return [buttons[n:n + sep] for n in range(0, len(buttons), sep)]
 
 
 def build_markup(
         data: Union[str, Dict[str, Any], Tuple[Dict[str, Any], ...], List[Dict[str, Any]], List[str], Tuple[str]],
         keyboard: Callable[..., Union[types.InlineKeyboardMarkup, types.ReplyKeyboardMarkup]] = inline_keyboard,
         buttons: Callable[..., Union[types.KeyboardButton, types.InlineKeyboardButton]] = get_inline_button,
-        step: int = DEFAULT_STEP
+        sep: int = DEFAULT_STEP
         
 ) -> Union[types.InlineKeyboardMarkup, types.ReplyKeyboardMarkup]:
     
@@ -51,9 +51,9 @@ def build_markup(
         return keyboard([[buttons(text=data)]])
     elif isinstance(data, (tuple, list)):
         if is_list_or_tuple_of_type(dict, data):
-            return keyboard(build_buttons([buttons(**value) for value in data], step)) # type: ignore
+            return keyboard(build_buttons([buttons(**value) for value in data], sep)) # type: ignore
         if is_list_or_tuple_of_type(str, data):
-            return keyboard(build_buttons([buttons(text=value) for value in data], step))
+            return keyboard(build_buttons([buttons(text=value) for value in data], sep))
     else:
         raise TypeError(f'Got unexpected type {type(data)}')
     

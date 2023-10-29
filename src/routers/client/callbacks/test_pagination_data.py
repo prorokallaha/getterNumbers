@@ -3,7 +3,7 @@ from aiogram import types, F
 from src.routers.client.router import client_router
 from src.common.middlewares.i18n import gettext as _
 from src.common.keyboards import build_markup
-from src.utils.buttons import (
+from src.common.keyboards.buttons import (
     back_button,
 )
 from src.utils.interactions import (

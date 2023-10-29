@@ -25,5 +25,6 @@ def previous_pagination_button() -> Dict[str, str]:
     return {'text': _('Previous'), 'callback_data': 'previous'}
 
 
-def pagination_data_button(text: str, data: str) -> Dict[str, str]:
-    return {'text': text, 'callback_data': f'data:{data}'}
+def pagination_data_button(data: Tuple[str, str]) -> Dict[str, str]:
+    text, cbdata = data
+    return {'text': text, 'callback_data': f'data:{cbdata}'}

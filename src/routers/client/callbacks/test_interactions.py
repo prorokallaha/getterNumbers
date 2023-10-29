@@ -1,4 +1,3 @@
-from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 from aiogram import types, F
 
@@ -6,8 +5,7 @@ from src.routers.client.router import client_router
 from src.utils.text import TEST_PAGINATION_MESSAGE
 from src.common.middlewares.i18n import gettext as _
 from src.common.keyboards import build_markup
-from src.utils.buttons import (
-    pagination_data_button, 
+from src.common.keyboards.buttons import (
     next_pagination_button, 
     previous_pagination_button,
     back_button,
@@ -45,7 +43,7 @@ async def next_data_callback(
 ) -> None:
     
     data = pagination.get(call.from_user.id)
-    buttons = [pagination_data_button(str(i), str(i)) for i in data.next()]
+    buttons = [data.func((str(i), str(i))) for i in data.next()]
     buttons += [previous_pagination_button()]
     if data.is_next_data_exists():
         buttons += [next_pagination_button()]
@@ -63,7 +61,7 @@ async def previous_data_callback(
 ) -> None:
     
     data = pagination.get(call.from_user.id)
-    buttons = [pagination_data_button(str(i), str(i)) for i in data.previous()]
+    buttons = [data.func((str(i), str(i))) for i in data.previous()]
     if data.is_previous_data_exists():
         buttons += [previous_pagination_button()]
         buttons += [next_pagination_button(), back_button()]

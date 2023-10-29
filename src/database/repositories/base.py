@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.repositories.crud import CRUDRepository, Model
 
-
 class BaseRepository(abc.ABC, Generic[Model]):
     
     model: Type[Model]
