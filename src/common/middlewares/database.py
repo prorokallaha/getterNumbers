@@ -31,15 +31,6 @@ class DatabaseMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
 
-        user: types.User = event.from_user # type: ignore
-        user_id = event.from_user.id # type: ignore
-        async with Database(async_session(self._session_factory)) as db:
-            data['db'] = db
-            db_user = await db.user.select(user_id)
-            if not db_user:
-                await db.user.create(UserCreate(
-                    user_id=user_id,
-                    **user.model_dump(exclude_none=True, exclude=set('id',))
-                ))
-          
-            return await handler(event, data)
+        data['db_pool'] = self._session_factory
+        return await handler(event, data)
+

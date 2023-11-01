@@ -1,8 +1,10 @@
+from functools import partial
+
 from aiogram.fsm.context import FSMContext
 from aiogram import types, F
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from src.routers.client.router import client_router
-from src.utils.text import TEST_PAGINATION_MESSAGE
 from src.common.middlewares.i18n import gettext as _
 from src.common.keyboards import build_markup
 from src.common.keyboards.buttons import (
@@ -11,35 +13,49 @@ from src.common.keyboards.buttons import (
     back_button,
 )
 from src.utils.interactions import (
-    PaginationMediator,
-    Chat, 
+    DataPaginationMediator,
+    ChatFunctionPagination, 
     safe_edit_message,
 )
+
+from src.routers.client.commands.test_start import start
 
 
 @client_router.callback_query(F.data == 'back')
 async def back_callback(
     call: types.CallbackQuery, 
-    chat: Chat,
-    pagination: PaginationMediator,
-    state: FSMContext
+    chat: ChatFunctionPagination,
+    pagination: DataPaginationMediator,
+    state: FSMContext,
+    db_pool: async_sessionmaker[AsyncSession]
 ) -> None:
     
-    last_message = chat.get_last_message(call.from_user.id)
-    pagination.clear(call.from_user.id)
-
-    await safe_edit_message(
-        call,
-        text=last_message.text, # type: ignore
-        reply_markup=last_message.reply_markup
-    )
+    data = (await state.get_data()).get('pagination')
     
+    if data and data.get('flag'):
+        try:
+            await safe_edit_message(
+                call,
+                text=data.get('text'),
+                reply_markup=build_markup(data.get('reply_markup'))
+            )
+        except TypeError:
+            await state.update_data(pagination={})
+            return await back_callback(call, chat, pagination, state, db_pool) # type: ignore
+    else:
+        default_message = partial(start, call.message, chat, pagination, db_pool)
+        last_message = chat.get_last_message(call.from_user.id, default_message)
+        if last_message.func.__name__ == 'start':
+            await call.message.delete()
+        pagination.clear(call.from_user.id)
+        await last_message()
+    await state.update_data(pagination={})
     await state.set_state()
 
 
 @client_router.callback_query(F.data == 'next')
 async def next_data_callback(
-    call: types.CallbackQuery, pagination: PaginationMediator
+    call: types.CallbackQuery, pagination: DataPaginationMediator, state: FSMContext
 ) -> None:
     
     data = pagination.get(call.from_user.id)
@@ -53,11 +69,12 @@ async def next_data_callback(
         text=data.text,
         reply_markup=build_markup(buttons)
     )
+    await state.update_data(pagination={'text': data.text, 'reply_markup': buttons, 'flag': False})
     
 
 @client_router.callback_query(F.data == 'previous')
 async def previous_data_callback(
-    call: types.CallbackQuery, pagination: PaginationMediator
+    call: types.CallbackQuery, pagination: DataPaginationMediator, state: FSMContext
 ) -> None:
     
     data = pagination.get(call.from_user.id)
@@ -72,3 +89,4 @@ async def previous_data_callback(
         text=data.text,
         reply_markup=build_markup(buttons)
     )
+    await state.update_data(pagination={'text': data.text, 'reply_markup': buttons, 'flag': False})

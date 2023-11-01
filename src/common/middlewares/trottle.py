@@ -4,18 +4,18 @@ from typing import (
     Callable, 
     Dict,
     Final,
+
 )
 
 from aiogram import BaseMiddleware
 from aiogram.fsm.storage.base import BaseStorage
 from aiogram.types import TelegramObject, CallbackQuery, Message
 
-
 from src.common.middlewares.i18n import gettext as _
 
 
 
-TRIGGER_VALUE: Final[int] = 2
+TRIGGER_VALUE: Final[int] = 4
 DEFAULT_MESSAGE_TIMEOUT: Final[int] = 10
 DEFAULT_CALLBACK_TIMEOUT: Final[int] = 1
 
@@ -51,7 +51,9 @@ class TrottlingMiddleware(BaseMiddleware):
             count = int(is_trottled.decode())
             if count == TRIGGER_VALUE:
                 await self._storage.redis.set(name=user, value=count + 1, ex=timeout) # type: ignore
-                return await event.answer(message, show_alert=True) # type: ignore
+                if isinstance(event, CallbackQuery):
+                    return await event.answer(message, show_alert=True) # type: ignore
+                return await event.answer(message) # type: ignore
             elif count > TRIGGER_VALUE:
                 return
             else:
@@ -59,5 +61,7 @@ class TrottlingMiddleware(BaseMiddleware):
         else:
             await self._storage.redis.set(name=user, value=1, ex=timeout) # type: ignore
 
+        if isinstance(event, CallbackQuery):
+            await event.answer() # fix loading issue
         return await handler(event, data)
     

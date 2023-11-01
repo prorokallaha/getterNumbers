@@ -23,7 +23,7 @@ from src.common.middlewares import (
     ChatMiddleware,
 )
 from src.common.middlewares.i18n import simple_locale_middleware
-from src.utils.interactions import PaginationMediator
+from src.utils.interactions import DataPaginationMediator
 
 
 async def on_startup(bot: Bot) -> None:
@@ -64,6 +64,7 @@ def register_middlewares(
 
 
 async def main() -> None:
+  
     settings = load_settings()
     bot = load_bot(settings)
     storage = load_storage(settings)
@@ -76,7 +77,7 @@ async def main() -> None:
     await dp.start_polling(
         bot, 
         allowed_updates=dp.resolve_used_update_types(),
-        pagination=PaginationMediator()
+        pagination=DataPaginationMediator()
     )
 
 

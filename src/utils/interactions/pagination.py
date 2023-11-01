@@ -11,7 +11,7 @@ from typing import (
 DEFAULT_PAGINATION_LIMIT: Final[int] = 10
 
 
-class InMemoryPagination:
+class InMemoryDataPagination:
 
     def __init__(self, data: List[Any], text: str, func: Callable[..., Any]) -> None:
         self.data = data
@@ -66,15 +66,15 @@ class InMemoryPagination:
         return previous_data
 
 
-class PaginationMediator:
+class DataPaginationMediator:
 
     def __init__(self) -> None:
-        self.data: Dict[int, InMemoryPagination] = {}
+        self.data: Dict[int, InMemoryDataPagination] = {}
 
     def add(self, user_id: int, data: List[Any], text: str, func: Callable[..., Any]) -> None:
-        self.data[user_id] = InMemoryPagination(data, text, func)
+        self.data[user_id] = InMemoryDataPagination(data, text, func)
     
-    def get(self, user_id: int) -> Optional[InMemoryPagination]:
+    def get(self, user_id: int) -> Optional[InMemoryDataPagination]:
         return self.data.get(user_id)
     
     def clear(self, user_id: int) -> None:

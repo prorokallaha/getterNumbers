@@ -1,4 +1,5 @@
 from aiogram import types, F
+from aiogram.fsm.context import FSMContext
 
 from src.routers.client.router import client_router
 from src.common.middlewares.i18n import gettext as _
@@ -13,8 +14,8 @@ from src.utils.interactions import (
 
 
 @client_router.callback_query(F.data.regexp(r'data:.+'))
-async def back_callback(
-    call: types.CallbackQuery, 
+async def inner_data_callback(
+    call: types.CallbackQuery, state: FSMContext
 ) -> None:
 
     await safe_delete_message(call)
@@ -23,4 +24,8 @@ async def back_callback(
         text=_(f'Your number of test-data: {data}. Deal with it'),
         reply_markup=build_markup(back_button())
     )
+    pagination = (await state.get_data()).get('pagination', {})
+    pagination['flag'] = True
+    await state.update_data(pagination=pagination)
+    
     

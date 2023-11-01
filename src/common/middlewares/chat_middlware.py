@@ -1,4 +1,5 @@
 from typing import Any, Awaitable, Callable, Dict
+from functools import partial
 
 from aiogram import BaseMiddleware
 from aiogram import types
@@ -12,8 +13,8 @@ class ChatMiddleware(BaseMiddleware):
 
     def __init__(self) -> None:
 
-        from src.utils.interactions.chat import Chat
-        self._chat = Chat()
+        from src.utils.interactions.chat import ChatFunctionPagination
+        self._chat = ChatFunctionPagination()
 
     async def __call__(
             self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]], 
@@ -24,8 +25,9 @@ class ChatMiddleware(BaseMiddleware):
         
         data['chat'] = self._chat
         result = await handler(event, data)
-        if isinstance(result, types.Message):
-            self._chat.set_message(event.from_user.id, result) # type: ignore
+        if result:
+            pfunc = partial(handler, event, data)
+            self._chat.set_message(event.from_user.id, pfunc) # type: ignore
         
         return result
     

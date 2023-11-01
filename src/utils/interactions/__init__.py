@@ -1,10 +1,11 @@
-from src.utils.interactions.chat import Chat
-from src.utils.interactions.pagination import PaginationMediator
+from src.utils.interactions.chat import ChatMessagePagination, ChatFunctionPagination
+from src.utils.interactions.pagination import DataPaginationMediator
 from src.utils.interactions.utils import safe_delete_message, safe_edit_message
 
 __all__ = (
-    'Chat',
-    'PaginationMediator',
+    'ChatMessagePagination',
+    'ChatFunctionPagination',
+    'DataPaginationMediator',
     'safe_delete_message',
     'safe_edit_message',
 )

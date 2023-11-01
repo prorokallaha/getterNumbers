@@ -1,11 +1,17 @@
 from __future__ import annotations
 
-from typing import Optional, Any, cast
+from typing import (
+    Optional, 
+    Any, 
+    cast, 
+)
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.core.unit_of_work import UnitOfWork
-from src.database.core.connection import async_session
+from src.database.core.connection import (
+    async_session, 
+)
 from src.database.core.mediator import build_mediator
 from src.database.repositories import (
     UserRepository,
@@ -17,6 +23,7 @@ class Database:
     def __init__(self, session: Optional[AsyncSession] = None) -> None:
         if session is None:
             session = async_session()
+        self._session = session
         self._uow = UnitOfWork(session)
         self._mediator = build_mediator(session)
 
@@ -31,3 +38,4 @@ class Database:
     @property
     def user(self) -> UserRepository:
         return cast(UserRepository, self._mediator.userrepository)
+    

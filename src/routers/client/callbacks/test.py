@@ -1,6 +1,7 @@
 from typing import Union
 
 from aiogram import types, F
+from aiogram.fsm.context import FSMContext
 
 from src.routers.client.router import client_router
 from src.utils.text import TEST_PAGINATION_MESSAGE
@@ -12,15 +13,15 @@ from src.common.keyboards.buttons import (
     back_button,
 )
 from src.utils.interactions import (
-    PaginationMediator,
+    DataPaginationMediator,
     safe_edit_message,
 )
 
 
 @client_router.callback_query(F.data == 'test')
 async def test_button(
-    call: types.CallbackQuery, pagination: PaginationMediator
-) -> Union[types.Message, bool]:
+    call: types.CallbackQuery, pagination: DataPaginationMediator, state: FSMContext
+) -> bool:
     
     pagination.add(call.from_user.id, list(range(100)), _(TEST_PAGINATION_MESSAGE), pagination_data_button)
     data = pagination.get(call.from_user.id)
@@ -29,9 +30,10 @@ async def test_button(
         buttons += [back_button(), next_pagination_button()]
     else:
         buttons += [back_button()]
-    msg = await safe_edit_message(
+    await safe_edit_message(
         call,
         data.text,
         reply_markup=build_markup(buttons)
     )
-    return msg
+    await state.update_data(pagination={'text': data.text, 'reply_markup': buttons})
+    return True

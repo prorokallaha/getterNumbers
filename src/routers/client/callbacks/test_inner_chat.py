@@ -16,9 +16,9 @@ from src.utils.interactions import (
 @client_router.callback_query(F.data == 'inner_chat_test')
 async def inner_chat_callback(
     call: types.CallbackQuery,
-) -> Union[types.Message, bool]:
+) -> bool:
     
-    msg = await safe_edit_message(
+    await safe_edit_message(
         call,
         'This is inner chat 1',
         reply_markup=build_markup(
@@ -28,15 +28,15 @@ async def inner_chat_callback(
             ]
         )
     )
-    return msg
+    return True
 
 
 @client_router.callback_query(F.data == 'inner_chat_test_2')
 async def inner_chat_2_callback(
     call: types.CallbackQuery,
-) -> Union[types.Message, bool]:
+) -> bool:
     
-    msg = await safe_edit_message(
+    await safe_edit_message(
         call,
         'This is inner chat 2',
         reply_markup=build_markup(
@@ -46,15 +46,15 @@ async def inner_chat_2_callback(
             ]
         )
     )
-    return msg
+    return True
 
 
 @client_router.callback_query(F.data == 'inner_chat_test_3')
 async def inner_chat_3_callback(
     call: types.CallbackQuery,
-) -> Union[types.Message, bool]:
+) -> bool:
     
-    msg = await safe_edit_message(
+    await safe_edit_message(
         call,
         'This is inner chat 3',
         reply_markup=build_markup(
@@ -64,15 +64,15 @@ async def inner_chat_3_callback(
             ]
         )
     )
-    return msg
+    return True
 
 
 @client_router.callback_query(F.data == 'inner_chat_test_4')
 async def inner_chat_4_callback(
     call: types.CallbackQuery,
-) -> Union[types.Message, bool]:
+) -> bool:
     
-    msg = await safe_edit_message(
+    await safe_edit_message(
         call,
         'This is inner chat 4',
         reply_markup=build_markup(
@@ -81,4 +81,4 @@ async def inner_chat_4_callback(
             ]
         )
     )
-    return msg
+    return True
