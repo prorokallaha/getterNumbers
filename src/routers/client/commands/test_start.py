@@ -1,40 +1,33 @@
-from functools import partial
+from typing import Any
 
-from aiogram.filters.command import Command
 from aiogram import types
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+from aiogram.filters.command import CommandStart
 
+from src.common.database.dto import UserCreate
+from src.keyboards import build_markup
+from src.keyboards.buttons import test_button
 from src.routers.client.router import client_router
-from src.common.keyboards.buttons import test_button
-from src.common.middlewares.i18n import gettext as _
-from src.common.keyboards import build_markup
+from src.services import ServiceGateway
+from src.utils.decorators import with_database_service
 from src.utils.interactions import ChatFunctionPagination, DataPaginationMediator
-from src.utils.text import START_COMMAND_MESSAGE
-from src.database.core.database import Database
-from src.database.dto import UserCreate
 
 
-@client_router.message(Command(commands=('start',), ignore_mention=True))
-async def start(
-    message: types.Message, 
+@client_router.message(CommandStart(ignore_mention=True))
+@with_database_service
+async def start_message(
+    message: types.Message,
     chat: ChatFunctionPagination,
     pagination: DataPaginationMediator,
-    db_pool: async_sessionmaker[AsyncSession],
+    user: types.User,
+    service: ServiceGateway,
+    **kwargs: Any
 ) -> None:
-    
-    default_message = partial(start, message, chat, pagination, db_pool)
     await message.answer(
-        text=_(START_COMMAND_MESSAGE), 
+        text='First message',
         reply_markup=build_markup(test_button())
     )
-    user_id = message.from_user.id
-    user = message.from_user
-    async with Database(db_pool()) as db:
-        db_user = await db.user.select(user_id)
-        if not db_user:
-            await db.user.create(UserCreate(
-                user_id=user_id,
-                **user.model_dump(exclude_none=True, exclude=set('id',))
-            ))
-    pagination.clear(message.from_user.id)
-    chat.set_message(message.from_user.id, default_message, True)
+    user_id = user.id
+    await service.user.create_user(UserCreate(**user.model_dump()))
+    pagination.clear(user_id)
+    chat.set_message(user_id, start_message, True)
+

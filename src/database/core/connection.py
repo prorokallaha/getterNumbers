@@ -1,28 +1,28 @@
-from typing import Optional
+from typing import Any, AsyncGenerator, TypeAlias
 
 from sqlalchemy.ext.asyncio import (
-    create_async_engine, 
-    AsyncEngine, 
-    async_sessionmaker, 
+    AsyncEngine,
     AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
 )
 
-from src.core import load_settings
+SessionPoolType: TypeAlias = async_sessionmaker[AsyncSession]
 
 
-def async_engine() -> AsyncEngine:
-    return create_async_engine(load_settings().db_url)
+def build_sa_engine(url: str, **options: Any) -> AsyncEngine:
+    return create_async_engine(url, **options)
 
 
-def create_session_factory(engine: Optional[AsyncEngine] = None) -> async_sessionmaker[AsyncSession]:
-    
-    if engine is None:
-        engine = async_engine()
-    
+def build_sa_session_factory(
+        engine: AsyncEngine
+) -> SessionPoolType:
     return async_sessionmaker(engine, autoflush=False, expire_on_commit=False)
 
 
-def async_session(session_factory: Optional[async_sessionmaker[AsyncSession]] = None) -> AsyncSession:
-    if session_factory is None:
-        session_factory = create_session_factory()
-    return session_factory()
+async def build_sa_session(
+        session_factory: SessionPoolType
+) -> AsyncGenerator[Any, AsyncSession]:
+
+    async with session_factory() as session:
+        yield session

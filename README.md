@@ -11,21 +11,18 @@ DIRECTORY STRUCTURE
 
 src/
     common/
-        filters/      there is your filters
-        keyboards/    there is your keyboards
         locales/      there is your locales, like en/ru
-        middlewares/  there is your middlewares
         ...
-        Here is actually can be your states/ or anything
-        what bot can use
+        Here is actually can be your interfaces or dto/entity/any
+    filters/      there is your filters
+    keyboards/    there is your keyboards
+    middlewares/  there is your middlewares
     core/
+        app.py        Your Application
         loader.py     here is your bot configurations
         settings.py   your settings for whole app
     database/
         core/         here is your connection or main class
-        dto/          here is yours data structures for database
-        interfaces/   your interfaces for database
-        migrations/   your db stages and versions
         models/       your db models
         repositories/ your repo for work with db models and queries
     routers/          your handlers/routers to interact with users
@@ -33,6 +30,21 @@ src/
     utils/            your utils for whole app
     __main__.py       entry point
      
+```
+## ENV_FILE
+First of all rename your `.env_example` to `.env`
+```
+
+BOT_TOKEN=yourtoken
+ADMINS=[] # optional
+DATABASE_URI=sqlite+aiosqlite:///{} # or any other driver 
+DATABASE_HOST=yourdbhost  # optional
+DATABASE_PORT=yourdbport # optional
+DATABASE_USER=yoourdbuser # optional
+DATABASE_NAME=mysuperdb.db
+DATABASE_PASSWORD=yourdbpassword # optional
+REDIS_SETTINGS={"host": "127.0.0.1", "port": 6379} # optional.
+
 ```
 ## download
 ```
@@ -48,7 +60,8 @@ alembic revision --autogenerate -m 'initial' && alembic upgrade head
 ```
 To create locale, for example `en`:
 ```
-pybabel init -i src/common/locales/messages.pot -d src/common/locales -D messages -l en
+pybabel init -i src/common/locales/messages.pot -d src/common/locales -D messages -l en -> Windows
+make babel_init -> Unix
 ```
 Extract text/update/compile:
 ## Unix
@@ -82,7 +95,7 @@ for Unix:
 python3 -m src
 ```
 And thats it!
-# Docker
+# Docker. With postgresql db example
 ## Unix:
 ```
 make docker_build
@@ -98,18 +111,4 @@ make docker_up
 ```
 docker-compose build && docker-compose run --rm migrate && docker-compose up -d
 ```
-## ENV_FILE
-First of all rename your `.env_example` to `.env`
-```
 
-BOT_TOKEN=yourtoken
-ADMINS=[] # optional
-DATABASE_URI=sqlite+aiosqlite:///{}
-DATABASE_HOST=yourdbhost  # optional
-DATABASE_PORT=yourdbport # optional
-DATABASE_USER=yoourdbuser # optional
-DATABASE_NAME=mysuperdb.db
-DATABASE_PASSWORD=yourdbpassword # optional
-REDIS_SETTINGS={"host": "127.0.0.1", "port": 6379} # optional.
-
-```

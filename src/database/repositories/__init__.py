@@ -1,12 +1,5 @@
-from typing import Tuple, Type
-
-from src.database.repositories.base import BaseRepository
-from src.database.repositories.user import UserRepository
+from src.database.repositories.crud import SQLAlchemyCRUDRepository
 
 __all__ = (
-    'UserRepository',
-)
-
-REPOSITORIES = (
-    UserRepository,
+    'SQLAlchemyCRUDRepository',
 )

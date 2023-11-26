@@ -1,11 +1,11 @@
 
 
 class DatabaseError(Exception):
-    pass 
+    pass
 
 
 class CommitError(DatabaseError):
-    pass 
+    pass
 
 
 class RollbackError(DatabaseError):

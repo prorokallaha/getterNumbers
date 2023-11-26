@@ -1,14 +1,14 @@
-from typing import Union
+from typing import Any
 
-from aiogram import types, F
+from aiogram import F, types
 
-from src.routers.client.router import client_router
-from src.common.middlewares.i18n import gettext as _
-from src.common.keyboards import build_markup
-from src.common.keyboards.buttons import (
+from src.keyboards import build_markup
+from src.keyboards.buttons import (
     back_button,
 )
+from src.routers.client.router import client_router
 from src.utils.interactions import (
+    BackButtonReturnType,
     safe_edit_message,
 )
 
@@ -16,8 +16,9 @@ from src.utils.interactions import (
 @client_router.callback_query(F.data == 'inner_chat_test')
 async def inner_chat_callback(
     call: types.CallbackQuery,
-) -> bool:
-    
+    **kwargs: Any
+) -> BackButtonReturnType:
+
     await safe_edit_message(
         call,
         'This is inner chat 1',
@@ -28,14 +29,15 @@ async def inner_chat_callback(
             ]
         )
     )
-    return True
+    return inner_chat_callback
 
 
 @client_router.callback_query(F.data == 'inner_chat_test_2')
 async def inner_chat_2_callback(
     call: types.CallbackQuery,
-) -> bool:
-    
+    **kwargs: Any
+) -> BackButtonReturnType:
+
     await safe_edit_message(
         call,
         'This is inner chat 2',
@@ -46,14 +48,15 @@ async def inner_chat_2_callback(
             ]
         )
     )
-    return True
+    return inner_chat_2_callback
 
 
 @client_router.callback_query(F.data == 'inner_chat_test_3')
 async def inner_chat_3_callback(
     call: types.CallbackQuery,
-) -> bool:
-    
+    **kwargs: Any
+) -> BackButtonReturnType:
+
     await safe_edit_message(
         call,
         'This is inner chat 3',
@@ -64,14 +67,15 @@ async def inner_chat_3_callback(
             ]
         )
     )
-    return True
+    return inner_chat_3_callback
 
 
 @client_router.callback_query(F.data == 'inner_chat_test_4')
 async def inner_chat_4_callback(
     call: types.CallbackQuery,
-) -> bool:
-    
+    **kwargs: Any
+) -> BackButtonReturnType:
+
     await safe_edit_message(
         call,
         'This is inner chat 4',
@@ -81,4 +85,4 @@ async def inner_chat_4_callback(
             ]
         )
     )
-    return True
+    return inner_chat_4_callback

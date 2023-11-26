@@ -1,28 +1,25 @@
 from typing import Optional
 
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
 from sqlalchemy import (
-    String,
+    BigInteger,
     Boolean,
-    BigInteger, 
+    String,
 )
+from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database.models.base import ModelWithTime, Base
+from src.database.models.base import Base
+from src.database.models.base.mixins import ModelWithTimeMixin
 
 
+class User(Base, ModelWithTimeMixin):
 
-class User(Base, ModelWithTime):
-
-    user_id: Mapped[int] = mapped_column(
+    id: Mapped[int] = mapped_column(
         BigInteger,
-        primary_key=True, 
+        primary_key=True,
         unique=True,
     )
-    is_bot: Mapped[bool] = mapped_column(
-        Boolean
-    )
-    first_name: Mapped[str] = mapped_column(String)
+    is_bot: Mapped[bool]
+    first_name: Mapped[str]
     username: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     last_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     language_code: Mapped[Optional[str]] = mapped_column(String, nullable=True)

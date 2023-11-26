@@ -2,14 +2,13 @@ import logging
 import os
 from logging import Handler
 from logging.handlers import RotatingFileHandler
-from typing import Dict, Any
+from typing import Any, Dict
 
 from src.core.settings import Settings
 
-
 LOGGING_EXCEPTIONS: Dict[str, Any] = {
     # you can actually use this if you want disable all of loggers.
-    # name: logging.CRITICAL for name in logging.root.manager.loggerDict 
+    # name: logging.CRITICAL for name in logging.root.manager.loggerDict
 }
 
 
@@ -52,4 +51,3 @@ class Logger(logging.Logger):
     def set_logging_exceptions(self, exceptions: Dict[str, int]) -> None:
         for logger_name in exceptions:
             logging.getLogger(logger_name).setLevel(exceptions[logger_name])
-            

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from aiogram import Dispatcher, Bot
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.base import BaseStorage
 
 from src.core.settings import Settings
@@ -9,10 +9,10 @@ from src.core.settings import Settings
 def load_storage(settings: Settings) -> BaseStorage:
 
     try:
-        from aiogram.fsm.storage.redis import RedisStorage
         import redis.asyncio as aioredis  # type: ignore
+        from aiogram.fsm.storage.redis import RedisStorage
         storage = RedisStorage(redis=aioredis.Redis(**settings.redis_settings))
-    except ImportError: 
+    except ImportError:
         from aiogram.fsm.storage.memory import MemoryStorage
         storage = MemoryStorage() # type: ignore
 

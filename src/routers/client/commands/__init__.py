@@ -1,1 +1,1 @@
-from src.routers.client.commands.test_start import *
+from src.routers.client.commands.test_start import * # noqa
