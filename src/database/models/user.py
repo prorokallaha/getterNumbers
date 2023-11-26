@@ -16,7 +16,7 @@ class User(Base, ModelWithTimeMixin):
     id: Mapped[int] = mapped_column(
         BigInteger,
         primary_key=True,
-        unique=True,
+        index=True,
     )
     is_bot: Mapped[bool]
     first_name: Mapped[str]

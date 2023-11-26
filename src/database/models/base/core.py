@@ -24,6 +24,3 @@ class Base(DeclarativeBase):
         return {
             attr:value for attr, value in self.__dict__.items() if not attr.startswith('_')
         }
-
-
-
