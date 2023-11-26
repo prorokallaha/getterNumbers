@@ -144,6 +144,7 @@ venv.bak/
 /site
 *_Store
 **/.DS_Store
+
 # mypy
 .mypy_cache/
 .dmypy.json
