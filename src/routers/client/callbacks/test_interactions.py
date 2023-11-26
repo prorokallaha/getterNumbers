@@ -2,7 +2,6 @@ from typing import Any
 
 from aiogram import F, types
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.keyboards import build_markup
 from src.keyboards.buttons import (
@@ -26,7 +25,6 @@ async def back_callback(
         chat: ChatFunctionPagination,
         pagination: DatabaseDataPaginationMediator,
         state: FSMContext,
-        db_pool: async_sessionmaker[AsyncSession],
         **kwargs: Any
 ) -> None:
 
@@ -38,7 +36,6 @@ async def back_callback(
             chat=chat,
             state=state,
             pagination=pagination,
-            db_pool=db_pool,
             **kwargs
         )
     else:
@@ -51,7 +48,6 @@ async def back_callback(
                 chat=chat,
                 state=state,
                 pagination=pagination,
-                db_pool=db_pool,
                 **kwargs
             )
         if func_name.endswith('callback'):
@@ -60,7 +56,6 @@ async def back_callback(
                 chat=chat,
                 state=state,
                 pagination=pagination,
-                db_pool=db_pool,
                 **kwargs
             )
     await state.set_state()

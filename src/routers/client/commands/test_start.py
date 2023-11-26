@@ -13,7 +13,7 @@ from src.utils.interactions import ChatFunctionPagination, DataPaginationMediato
 
 
 @client_router.message(CommandStart(ignore_mention=True))
-@with_database_service
+@with_database_service # if you want to use db moments in specific handler
 async def start_message(
     message: types.Message,
     chat: ChatFunctionPagination,
@@ -27,7 +27,9 @@ async def start_message(
         reply_markup=build_markup(test_button())
     )
     user_id = user.id
-    await service.user.create_user(UserCreate(**user.model_dump()))
+    db_user = await service.user.exists(user_id)
+    if not db_user:
+        await service.user.create_user(UserCreate(**user.model_dump())) # creating a user at start if not exists
     pagination.clear(user_id)
     chat.set_message(user_id, start_message, True)
 

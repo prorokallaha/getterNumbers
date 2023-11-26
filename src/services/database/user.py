@@ -27,3 +27,6 @@ class UserService(BaseDBService[User]):
     async def delete_user(self, user_id: int) -> Optional[User]:
         result = await self._crud.delete(self.model.id==user_id)
         return result[0] if result else None
+
+    async def exists(self, user_id: int) -> bool:
+        return await self._crud.exists(self.model.id==user_id)
