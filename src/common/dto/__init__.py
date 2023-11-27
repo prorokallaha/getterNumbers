@@ -1,4 +1,4 @@
-from srccommon.dto.user import UserCreate, UserUpdate
+from src.common.dto.user import UserCreate, UserUpdate
 
 __all__ = (
     'UserCreate',
