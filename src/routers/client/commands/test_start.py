@@ -27,7 +27,7 @@ async def start_message(
         reply_markup=build_markup(test_button())
     )
     user_id = user.id
-    db_user = await service.user.exists(user_id)
+    db_user = await service.user.is_user_exists(user_id)
     if not db_user:
         await service.user.create_user(UserCreate(**user.model_dump())) # creating a user at start if not exists
     pagination.clear(user_id)
