@@ -6,12 +6,10 @@ from src.database import (
     build_sa_engine,
     build_sa_session_factory,
 )
-
 from src.middlewares import ChatMiddleware, ErrorMiddleware
 from src.routers import router
 from src.utils.interactions import DatabaseDataPaginationMediator
 from src.utils.logger import Logger
-
 
 
 async def main() -> None:

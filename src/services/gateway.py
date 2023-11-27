@@ -5,6 +5,7 @@ from typing import Any, cast
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.core.unit_of_work import SQLALchemyUnitOfWork
+from src.services import SERVICES
 from src.services.database.user import UserService
 from src.services.mediator import ServiceMediator, build_mediator
 
@@ -39,10 +40,7 @@ class ServiceGateway:
 
 def service_gateway_factory(session: AsyncSession) -> ServiceGateway:
 
-    services = (
-        UserService,
-    )
     return ServiceGateway(
         SQLALchemyUnitOfWork(session),
-        build_mediator(session, *services)
+        build_mediator(session, *SERVICES)
     )

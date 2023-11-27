@@ -21,7 +21,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.common.database.interfaces import AbstractCRUDRepository
+from src.database.common.interfaces import AbstractCRUDRepository
 from src.database.models.base import Base
 
 ModelT = TypeVar('ModelT', bound=Base)

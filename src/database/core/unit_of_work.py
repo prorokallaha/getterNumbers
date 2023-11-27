@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncSessionTransaction
 
-from src.common.database.interfaces.unit_of_work import AbstractUnitOfWork
+from src.database.common.interfaces.unit_of_work import AbstractUnitOfWork
 from src.database.exceptions import CommitError, RollbackError
 
 

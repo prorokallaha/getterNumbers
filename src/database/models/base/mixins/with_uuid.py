@@ -1,9 +1,7 @@
 import uuid
 from typing import Optional
 
-from sqlalchemy import (
-    text,
-)
+from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
