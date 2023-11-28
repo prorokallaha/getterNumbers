@@ -40,13 +40,13 @@ class ServiceMediator:
 
 def build_mediator(
     session: SessionType,
-    crud: Type[AbstractCRUDRepository[SessionType, ModelT]],
+    crud_repo: Type[AbstractCRUDRepository[SessionType, ModelT]],
     services: Mapping[Type[ModelT], Type[BaseService[SessionType, ModelT]]],
 ) -> ServiceMediator:
 
     mediator = ServiceMediator()
 
     for model, service in services.items():
-        mediator.add(service(crud(session, model)))
+        mediator.add(service(crud_repo(session, model)))
 
     return mediator
