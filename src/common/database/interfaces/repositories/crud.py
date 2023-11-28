@@ -8,21 +8,23 @@ from typing import (
     Optional,
     Sequence,
     Type,
-    TypeVar,
 )
 
 from sqlalchemy import ColumnExpressionArgument
 
-EntryType = TypeVar('EntryType')
+from src.common.types import EntryType, SessionType
 
 
-class AbstractCRUDRepository(abc.ABC, Generic[EntryType]):
+class AbstractCRUDRepository(
+    abc.ABC, Generic[SessionType, EntryType]
+):
 
-    def __init__(self, model: Type[EntryType]) -> None:
+    def __init__(self, session: SessionType, model: Type[EntryType]) -> None:
+        self._session = session
         self.model = model
 
     @abc.abstractmethod
-    async def create(self, **values: Dict[str, Any]) -> Optional[EntryType]:
+    async def create(self, **values: Any) -> Optional[EntryType]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -36,7 +38,7 @@ class AbstractCRUDRepository(abc.ABC, Generic[EntryType]):
     async def update(
             self,
             *clauses: ColumnExpressionArgument[bool],
-            **values: Dict[str, Any]
+            **values: Any
     ) -> Sequence[EntryType]:
         raise NotImplementedError
 

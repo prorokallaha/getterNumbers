@@ -9,7 +9,7 @@ from src.core.settings import Settings
 def load_storage(settings: Settings) -> BaseStorage:
 
     try:
-        import redis.asyncio as aioredis  # type: ignore
+        import redis.asyncio as aioredis
         from aiogram.fsm.storage.redis import RedisStorage
         storage = RedisStorage(redis=aioredis.Redis(**settings.redis_settings))
     except ImportError:

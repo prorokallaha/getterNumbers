@@ -2,19 +2,18 @@ from __future__ import annotations
 
 import abc
 from types import TracebackType
-from typing import Generic, Optional, Type, TypeVar
+from typing import Generic, Optional, Type
 
-SessionT = TypeVar('SessionT')
-TransactionT = TypeVar('TransactionT')
+from src.common.types import SessionType, TransactionType
 
 
-class AbstractUnitOfWork(abc.ABC, Generic[SessionT, TransactionT]):
+class AbstractUnitOfWork(abc.ABC, Generic[SessionType, TransactionType]):
 
-    def __init__(self, session: SessionT) -> None:
+    def __init__(self, session: SessionType) -> None:
         self._session = session
-        self._transaction: Optional[TransactionT] = None
+        self._transaction: Optional[TransactionType] = None
 
-    async def __aenter__(self) -> AbstractUnitOfWork[SessionT, TransactionT]:
+    async def __aenter__(self) -> AbstractUnitOfWork[SessionType, TransactionType]:
         await self._create_transaction()
         return self
 

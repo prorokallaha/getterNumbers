@@ -1,5 +1,6 @@
-from src.services.database.user import UserService
+from src.services.database.gateway import ServiceGateway, service_gateway_factory
 
 __all__ = (
-    'UserService',
+    'ServiceGateway',
+    'service_gateway_factory',
 )

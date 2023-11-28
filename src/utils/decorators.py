@@ -1,7 +1,7 @@
 from functools import wraps
 from typing import Any, Awaitable, Callable, ParamSpec
 
-from src.services import service_gateway_factory
+from src.services.database import service_gateway_factory
 
 P = ParamSpec('P')
 

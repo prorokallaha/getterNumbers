@@ -7,7 +7,7 @@ from src.common.dto import UserCreate
 from src.keyboards import build_markup
 from src.keyboards.buttons import test_button
 from src.routers.client.router import client_router
-from src.services import ServiceGateway
+from src.services.database import ServiceGateway
 from src.utils.decorators import with_database_service
 from src.utils.interactions import ChatFunctionPagination, DataPaginationMediator
 
