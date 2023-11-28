@@ -1,11 +1,14 @@
 from typing import Optional, Type
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.common.dto import UserCreate, UserUpdate
 from src.database.models.user import User
 from src.services.database.services.base import BaseService
 
 
-class UserService(BaseService[User]):
+class UserService(BaseService[AsyncSession, User]):
+
     model: Type[User] = User
 
     async def create_user(self, query: UserCreate) -> Optional[User]:
