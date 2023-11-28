@@ -6,5 +6,5 @@ __all__ = (
 )
 
 SERVICES = {
-    User: UserService,
+    User: UserService, # register your services here
 }

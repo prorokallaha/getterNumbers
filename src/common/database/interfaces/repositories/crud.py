@@ -10,8 +10,6 @@ from typing import (
     Type,
 )
 
-from sqlalchemy import ColumnExpressionArgument
-
 from src.common.types import EntryType, SessionType
 
 
@@ -30,20 +28,20 @@ class AbstractCRUDRepository(
     @abc.abstractmethod
     async def select(
             self,
-            *clauses: ColumnExpressionArgument[bool],
+            *clauses: Any,
     ) -> Optional[EntryType]:
         raise NotImplementedError
 
     @abc.abstractmethod
     async def update(
             self,
-            *clauses: ColumnExpressionArgument[bool],
+            *clauses: Any,
             **values: Any
     ) -> Sequence[EntryType]:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def delete(self, *clauses: ColumnExpressionArgument[bool]) -> Sequence[EntryType]:
+    async def delete(self, *clauses: Any) -> Sequence[EntryType]:
         raise NotImplementedError
 
     async def create_many(
@@ -54,7 +52,7 @@ class AbstractCRUDRepository(
 
     async def select_many(
             self,
-            *clauses: ColumnExpressionArgument[bool],
+            *clauses: Any,
             offset: Optional[int],
             limit: Optional[int],
     ) -> Sequence[EntryType]:
@@ -63,9 +61,9 @@ class AbstractCRUDRepository(
     async def update_many(self, data: Sequence[Dict[str, Any]]) -> Any:
         raise NotImplementedError
 
-    async def exists(self, *clauses: ColumnExpressionArgument[bool]) -> bool:
+    async def exists(self, *clauses: Any) -> bool:
         raise NotImplementedError
 
-    async def count(self, *clauses: ColumnExpressionArgument[bool]) -> int:
+    async def count(self, *clauses: Any) -> int:
         raise NotImplementedError
 
