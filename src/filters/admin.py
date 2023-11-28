@@ -8,7 +8,7 @@ from src.core import load_settings
 
 class IsAdmin(Filter):
 
-    def __init__(self, admins: Optional[List[int]] = load_settings().admins) -> None:
+    def __init__(self, admins: Optional[List[int]] = load_settings().bot.admins) -> None:
         self.admins = admins or []
 
     async def __call__(

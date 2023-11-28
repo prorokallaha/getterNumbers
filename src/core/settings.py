@@ -2,8 +2,6 @@ import os
 from functools import lru_cache
 from pathlib import Path
 from typing import (
-    Any,
-    Dict,
     List,
     Optional,
     TypeAlias,
@@ -15,38 +13,67 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _StrPath: TypeAlias = Union[os.PathLike[str], str, Path]
 
-
-class Settings(BaseSettings):
+class DatabaseSettings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_file='./.env',
         env_file_encoding='utf-8',
-        case_sensitive=False
+        case_sensitive=False,
+        env_prefix='DATABASE_'
     )
-    bot_token: str
-    database_uri: str
-    database_name: str
-    database_host: Optional[str] = None
-    database_port: Optional[int] = None
-    database_user: Optional[str] = None
-    database_password: Optional[str] = None
-    admins: Optional[List[int]] = None
+
+    uri: str
+    name: str
+    host: Optional[str] = None
+    port: Optional[int] = None
+    user: Optional[str] = None
+    password: Optional[str] = None
+    echo: Optional[bool] = None
+    future: Optional[bool] = True
+
+    @property
+    def url(self) -> str:
+        if 'sqlite' in self.uri:
+            return self.uri.format(self.name)
+        return self.uri.format(
+            self.user,
+            self.password,
+            self.host,
+            self.port,
+            self.name,
+        )
+
+class BotSettings(BaseSettings):
+
+    model_config = SettingsConfigDict(
+        env_file='./.env',
+        env_file_encoding='utf-8',
+        case_sensitive=False,
+        env_prefix='BOT_'
+    )
+
+    token: str
+    admins: List[int] = []
     parse_mode: Union[ParseMode, str] = ParseMode.HTML
     disable_web_page_preview: Optional[bool] = True
     protect_content: Optional[bool] = None
-    redis_settings: Dict[str, Any] = {}
 
-    @property
-    def db_url(self) -> str:
-        if 'sqlite' in self.database_uri:
-            return self.database_uri.format(self.database_name)
-        return self.database_uri.format(
-            self.database_user,
-            self.database_password,
-            self.database_host,
-            self.database_port,
-            self.database_name,
-        )
+class RedisSettings(BaseSettings):
+
+    model_config = SettingsConfigDict(
+        env_file='./.env',
+        env_file_encoding='utf-8',
+        case_sensitive=False,
+        env_prefix='REDIS_'
+    )
+    host: str = '127.0.0.1'
+    port: int = 6379
+
+class Settings(BaseSettings):
+
+    db: DatabaseSettings = DatabaseSettings() # type: ignore
+    bot: BotSettings = BotSettings() # type: ignore
+    redis: RedisSettings = RedisSettings() # type: ignore
 
     @staticmethod
     def root_dir() -> Path:
@@ -61,6 +88,6 @@ class Settings(BaseSettings):
         return os.path.join(base_path, *paths)
 
 
-@lru_cache(typed=True)
+@lru_cache
 def load_settings() -> Settings:
     return Settings() # type: ignore

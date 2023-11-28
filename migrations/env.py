@@ -13,9 +13,9 @@ from src.database.models import Base
 target_metadata = Base.metadata
 
 config = context.config
-config.set_main_option('sqlalchemy.url', load_settings().db_url)
+config.set_main_option("sqlalchemy.url", load_settings().db.url)
 
-fileConfig(config.config_file_name) # type: ignore
+fileConfig(config.config_file_name)  # type: ignore
 
 
 def run_migrations_offline() -> None:
@@ -44,7 +44,6 @@ def run_migrations_offline() -> None:
 
 @no_type_check
 def do_run_migrations(connection: AsyncConnection) -> None:
-
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
@@ -65,7 +64,7 @@ async def run_migrations_online() -> None:
     """
     connectable = AsyncEngine(
         engine_from_config(
-            config.get_section(config.config_ini_section), # type: ignore
+            config.get_section(config.config_ini_section),  # type: ignore
             prefix="sqlalchemy.",  # noqa
             poolclass=pool.NullPool,
             future=True,
