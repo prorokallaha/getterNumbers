@@ -53,8 +53,8 @@ class AbstractCRUDRepository(
     async def select_many(
             self,
             *clauses: Any,
-            offset: Optional[int],
-            limit: Optional[int],
+            offset: Optional[int] = None,
+            limit: Optional[int] = None,
     ) -> Sequence[EntryType]:
         raise NotImplementedError
 

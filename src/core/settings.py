@@ -90,4 +90,4 @@ class Settings(BaseSettings):
 
 @lru_cache
 def load_settings() -> Settings:
-    return Settings() # type: ignore
+    return Settings()
