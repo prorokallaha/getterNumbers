@@ -1,4 +1,10 @@
-from typing import Any, Mapping, Optional, Type
+from typing import (
+    Any,
+    Dict,
+    Mapping,
+    Optional,
+    Type,
+)
 
 from src.common.database.interfaces.repositories.crud import AbstractCRUDRepository
 from src.common.services.service import ServiceType
@@ -9,16 +15,16 @@ from src.database.repositories.crud import ModelT
 class ServiceMediator:
 
     def __init__(self) -> None:
-        self._services = {}
+        self._services: Dict[str, ServiceType] = {}
 
     def add(
             self,
-            service_instance: ServiceType,
-            service_name: Optional[str] = None
+            instance: ServiceType,
+            name: Optional[str] = None
     ) -> None:
         self._services[
-            service_name or type(service_instance).__name__.lower()
-        ] = service_instance
+            name or type(instance).__name__.lower()
+        ] = instance
 
     def get(self, key: str) -> Optional[ServiceType]:
         return self._services.get(key)

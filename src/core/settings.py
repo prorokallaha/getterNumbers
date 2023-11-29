@@ -73,7 +73,7 @@ class Settings(BaseSettings):
 
     db: DatabaseSettings = DatabaseSettings() # type: ignore
     bot: BotSettings = BotSettings() # type: ignore
-    redis: RedisSettings = RedisSettings() # type: ignore
+    redis: RedisSettings = RedisSettings()
 
     @staticmethod
     def root_dir() -> Path:
