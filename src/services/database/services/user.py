@@ -1,15 +1,13 @@
-from typing import Optional, Type
+from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.common.dto import UserCreate, UserUpdate
+from src.common.services.service import AbstractService
 from src.database.models.user import User
-from src.services.database.services.base import BaseService
 
 
-class UserService(BaseService[AsyncSession, User]):
-
-    model: Type[User] = User
+class UserService(AbstractService[AsyncSession, User]):
 
     async def create_user(self, query: UserCreate) -> Optional[User]:
         return await self._crud_repo.create(**query.model_dump(exclude_none=True))

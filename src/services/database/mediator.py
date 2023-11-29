@@ -1,9 +1,9 @@
 from typing import Any, Mapping, Optional, Type
 
 from src.common.database.interfaces.repositories.crud import AbstractCRUDRepository
+from src.common.services.service import ServiceType
 from src.common.types import SessionType
 from src.database.repositories.crud import ModelT
-from src.services.database.services.base import BaseService
 
 
 class ServiceMediator:
@@ -13,14 +13,14 @@ class ServiceMediator:
 
     def add(
             self,
-            service_instance: BaseService[SessionType, ModelT],
+            service_instance: ServiceType,
             service_name: Optional[str] = None
     ) -> None:
         self._services[
             service_name or type(service_instance).__name__.lower()
         ] = service_instance
 
-    def get(self, key: str) -> Optional[BaseService[SessionType, ModelT]]:
+    def get(self, key: str) -> Optional[ServiceType]:
         return self._services.get(key)
 
     def __getattr__(self, key: str) -> Any:
@@ -41,7 +41,7 @@ class ServiceMediator:
 def build_mediator(
     session: SessionType,
     crud_repo: Type[AbstractCRUDRepository[SessionType, ModelT]],
-    services: Mapping[Type[ModelT], Type[BaseService[SessionType, ModelT]]],
+    services: Mapping[Type[ModelT], Type[ServiceType]],
 ) -> ServiceMediator:
 
     mediator = ServiceMediator()
