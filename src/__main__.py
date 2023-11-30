@@ -8,6 +8,7 @@ from src.database import (
 )
 from src.middlewares import ChatMiddleware, ErrorMiddleware
 from src.routers import router
+from src.services.database.gateway import service_gateway_factory
 from src.utils.interactions import DatabaseDataPaginationMediator
 from src.utils.logger import Logger
 
@@ -33,7 +34,7 @@ async def main() -> None:
         await app.start(
             allow_updates=dispatcher.resolve_used_update_types(),
             pagination=DatabaseDataPaginationMediator(),
-            db_pool=session_pool,
+            service=lambda: service_gateway_factory(session_pool()),
             admins=settings.bot.admins,
         )
     finally:

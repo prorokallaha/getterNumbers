@@ -13,7 +13,7 @@ from src.utils.interactions import ChatFunctionPagination, DataPaginationMediato
 
 
 @client_router.message(CommandStart(ignore_mention=True))
-@with_database_service  # if you want to use db moments in specific handler
+@with_database_service()  # if you want to use db moments in specific handler
 async def start_message(
     message: types.Message,
     chat: ChatFunctionPagination,

@@ -89,7 +89,7 @@ class AsyncDatabaseOffsetPagination:
     def __init__(
             self,
             dfunc: Callable[..., Any],
-            func: Callable[..., Coroutine[Any, Any, Union[Sequence[Any], List[Any]]]],
+            func: Callable[..., Coroutine[Any, Any, Sequence[Any]]],
             text: str,
             page: int = 0,
             **kwargs: Any,
@@ -148,7 +148,7 @@ class DatabaseDataPaginationMediator:
             self,
             user_id: int,
             dfunc: Callable[..., Any],
-            func: Callable[..., Coroutine[Any, Any, Union[Sequence[Any], List[Any]]]],
+            func: Callable[..., Coroutine[Any, Any, Sequence[Any]]],
             text: str,
             page: int = 0,
             **kwargs: Any
