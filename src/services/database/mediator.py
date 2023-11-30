@@ -30,12 +30,11 @@ class ServiceMediator:
         return self._services.get(key)
 
     def __getattr__(self, key: str) -> Any:
-        try:
-            return self._services[key]
-        except KeyError as err:
+        if not (value := self._services.get(key)):
             raise AttributeError(
                 f"'{type(self).__name__}' object has no attribute '{key}'"
-            ) from err
+            )
+        return value
 
     def __setattr__(self, key: str, value: Any) -> None:
         if key != "_services":
