@@ -18,7 +18,7 @@ def with_database_service(
         async def _inner_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             try:
                 service = kwargs['service']
-            except IndexError as e:
+            except KeyError as e:
                 raise TypeError(
                     'service does not exists in function signature'
                 ) from e
