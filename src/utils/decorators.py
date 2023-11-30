@@ -16,12 +16,11 @@ def with_database_service(
 
         @wraps(handler)
         async def _inner_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            try:
-                service = kwargs['service']
-            except KeyError as e:
+
+            if (service := kwargs.get('service')) is None:
                 raise TypeError(
                     'service does not exists in function signature'
-                ) from e
+                )
 
             if not callable(service):
                 raise TypeError('service param must be a callable type')
