@@ -4,13 +4,16 @@ from typing import (
     Final,
     Optional,
     Sequence,
+    Type,
     TypeVar,
+    Union,
     cast,
 )
 
 from sqlalchemy import (
     ColumnExpressionArgument,
     CursorResult,
+    TableClause,
     delete,
     exists,
     func,
@@ -84,3 +87,8 @@ class SQLAlchemyCRUDRepository(
         stmt = select(func.count(ASTERISK)).where(*clauses).select_from(self.model)
 
         return cast(int, await self._session.scalar(stmt))
+
+    async def create_relationship(
+            self, model: Union[TableClause, Type[Any]], **values: Any
+    ) -> None:
+        await self._session.execute(insert(model).values(**values))

@@ -8,10 +8,12 @@ from typing import (
     Optional,
     Sequence,
     Type,
+    TypeVar,
 )
 
 from src.common.types import EntryType, SessionType
 
+T = TypeVar('T')
 
 class AbstractCRUDRepository(
     abc.ABC, Generic[SessionType, EntryType]
@@ -67,3 +69,5 @@ class AbstractCRUDRepository(
     async def count(self, *clauses: Any) -> int:
         raise NotImplementedError
 
+    async def create_relationship(self, model: Any, **values: Any) -> Any:
+        raise NotImplementedError
