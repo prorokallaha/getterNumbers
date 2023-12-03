@@ -9,7 +9,10 @@ from src.keyboards.buttons import test_button
 from src.routers.client.router import client_router
 from src.services.database import ServiceGateway
 from src.utils.decorators import with_database_service
-from src.utils.interactions import ChatFunctionPagination, DataPaginationMediator
+from src.utils.interactions import (
+    ChatFunctionPagination,
+    DatabaseDataPaginationMediator,
+)
 
 
 @client_router.message(CommandStart(ignore_mention=True))
@@ -17,7 +20,7 @@ from src.utils.interactions import ChatFunctionPagination, DataPaginationMediato
 async def start_message(
     message: types.Message,
     chat: ChatFunctionPagination,
-    pagination: DataPaginationMediator,
+    pagination: DatabaseDataPaginationMediator,
     user: types.User,
     service: ServiceGateway,
     **kwargs: Any

@@ -31,6 +31,10 @@ src/
     __main__.py       entry point
      
 ```
+## Download
+```
+git clone git@github.com:hpphpro/aiogram_template.git
+```
 ## ENV_FILE
 First of all rename your `.env_example` to `.env`
 ```
@@ -45,10 +49,6 @@ DATABASE_NAME=mysuperdb.db
 DATABASE_PASSWORD=yourdbpassword # optional
 REDIS_SETTINGS={"host": "127.0.0.1", "port": 6379} # optional.
 
-```
-## download
-```
-git clone git@github.com:hpphpro/aiogram_template.git
 ```
 # Installation
 ```
