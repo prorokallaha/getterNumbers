@@ -8,7 +8,6 @@ from src.database import (
 )
 from src.middlewares import ChatMiddleware, ErrorMiddleware
 from src.routers import router
-from src.services.database.gateway import service_gateway_factory
 from src.utils.interactions import DatabaseDataPaginationMediator
 from src.utils.logger import Logger
 
@@ -29,12 +28,12 @@ async def main() -> None:
         echo=settings.db.echo,
         future=settings.db.future
     )
-    session_pool = build_sa_session_factory(engine)
+    session_factory = build_sa_session_factory(engine)
     try:
         await app.start(
             allow_updates=dispatcher.resolve_used_update_types(),
             pagination=DatabaseDataPaginationMediator(),
-            service=lambda: service_gateway_factory(session_pool()),
+            session_factory=session_factory,
             admins=settings.bot.admins,
         )
     finally:

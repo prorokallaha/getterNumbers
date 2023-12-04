@@ -1,7 +1,9 @@
 from functools import wraps
 from typing import Awaitable, Callable, ParamSpec, TypeVar
 
-from src.common.services.gateway import AbstractServiceGateway
+from sqlalchemy.ext.asyncio import async_sessionmaker
+
+from src.services.database.gateway import service_gateway_factory
 
 P = ParamSpec('P')
 R = TypeVar('R')
@@ -17,22 +19,24 @@ def with_database_service(
         @wraps(handler)
         async def _inner_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
 
-            if (service := kwargs.get('service')) is None:
+            if (session_factory := kwargs.get('session_factory')) is None:
                 raise TypeError(
-                    'service does not exists in function signature'
+                    'session_factory does not exists in function signature'
                 )
 
-            if not callable(service):
-                raise TypeError('service param must be a callable type')
+            if not callable(session_factory):
+                raise TypeError('session_factory param must be a callable type')
 
-            if (gateway := service()) and not isinstance(gateway, AbstractServiceGateway):
+            if not isinstance(session_factory, async_sessionmaker):
                 raise TypeError(
-                    f'service function must returning Gateway type, not {type(gateway).__name__}'
+                    f'session_factory function must returning async_sessionmaker type, not {type(session_factory).__name__}'
                 )
-
+            session = session_factory()
+            gateway = service_gateway_factory(session)
             kwargs['service'] = gateway
             if select_only:
-                return await handler(*args, **kwargs)
+                async with session:
+                    return await handler(*args, **kwargs)
             async with gateway:
                 return await handler(*args, **kwargs)
 
