@@ -1,5 +1,3 @@
-from src.database.repositories.crud import SQLAlchemyCRUDRepository
+from src.database.repositories.user import UserRepository
 
-__all__ = (
-    'SQLAlchemyCRUDRepository',
-)
+__all__ = ("UserRepository",)

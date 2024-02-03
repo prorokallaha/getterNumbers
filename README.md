@@ -47,7 +47,8 @@ DATABASE_PORT=yourdbport # optional
 DATABASE_USER=yoourdbuser # optional
 DATABASE_NAME=mysuperdb.db
 DATABASE_PASSWORD=yourdbpassword # optional
-REDIS_SETTINGS={"host": "127.0.0.1", "port": 6379} # optional.
+REDIS_HOST=127.0.0.1 # optional
+REDIS_PORT=6379 # optional
 
 ```
 # Installation

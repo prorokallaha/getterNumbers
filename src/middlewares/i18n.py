@@ -5,8 +5,8 @@ from aiogram.utils.i18n.middleware import SimpleI18nMiddleware
 
 from src.core.settings import Settings
 
-DEFAULT_LOCALE_PATH: str = Settings.path('src', 'common', 'locales')
-DEFAULT_LOCALE: Final[str] = 'en'
+DEFAULT_LOCALE_PATH: str = Settings.path("src", "common", "locales")
+DEFAULT_LOCALE: Final[str] = "en"
 
 try:
     import babel  # noqa

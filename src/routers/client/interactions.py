@@ -9,8 +9,8 @@ from src.keyboards.buttons import (
     next_pagination_button,
     previous_pagination_button,
 )
-from src.routers.client.commands.test_start import start_message
 from src.routers.client.router import client_router
+from src.routers.client.start import start_message
 from src.utils.interactions import (
     ChatFunctionPagination,
     DatabaseDataPaginationMediator,
@@ -21,52 +21,37 @@ from src.utils.interactions import (
 
 @client_router.callback_query(F.data == "back")
 async def back_callback(
-        call: types.CallbackQuery,
-        chat: ChatFunctionPagination,
-        pagination: DatabaseDataPaginationMediator,
-        state: FSMContext,
-        **kwargs: Any
+    call: types.CallbackQuery,
+    chat: ChatFunctionPagination,
+    pagination: DatabaseDataPaginationMediator,
+    state: FSMContext,
+    **kwargs: Any,
 ) -> None:
-
     last_message = chat.get_last_message(call.from_user.id)
     if not last_message:
         await safe_delete_message(call)
         await start_message(
-            call.message,
-            chat=chat,
-            state=state,
-            pagination=pagination,
-            **kwargs
+            call.message, chat=chat, state=state, pagination=pagination, **kwargs
         )
     else:
         func_name = last_message.__name__
-        if func_name.endswith('message'):
-            if func_name == 'start_message':
+        if func_name.endswith("message"):
+            if func_name == "start_message":
                 await safe_delete_message(call)
             await last_message(
-                call.message,
-                chat=chat,
-                state=state,
-                pagination=pagination,
-                **kwargs
+                call.message, chat=chat, state=state, pagination=pagination, **kwargs
             )
-        if func_name.endswith('callback'):
+        if func_name.endswith("callback"):
             await last_message(
-                call,
-                chat=chat,
-                state=state,
-                pagination=pagination,
-                **kwargs
+                call, chat=chat, state=state, pagination=pagination, **kwargs
             )
     await state.set_state()
 
 
 @client_router.callback_query(F.data == "next")
 async def next_data_callback(
-        call: types.CallbackQuery,
-        pagination: DatabaseDataPaginationMediator
+    call: types.CallbackQuery, pagination: DatabaseDataPaginationMediator
 ) -> None:
-
     data = pagination.get(call.from_user.id)
 
     buttons = [data.dfunc(elem) for elem in await data.next()]
@@ -80,10 +65,8 @@ async def next_data_callback(
 
 @client_router.callback_query(F.data == "previous")
 async def previous_data_callback(
-        call: types.CallbackQuery,
-        pagination: DatabaseDataPaginationMediator
+    call: types.CallbackQuery, pagination: DatabaseDataPaginationMediator
 ) -> None:
-
     data = pagination.get(call.from_user.id)
 
     buttons = [data.dfunc(elem) for elem in await data.previous()]

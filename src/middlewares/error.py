@@ -22,7 +22,7 @@ class ErrorMiddleware(BaseMiddleware):
         try:
             return await handler(event, data)
         except Exception as e:
-            self._logger.error(f'{e}')
+            self._logger.exception(f'{e}')
             await safe_delete_message(event) # type: ignore
             if isinstance(event, types.CallbackQuery):
                 await event.message.answer('Что-то пошло не так, попробуйте еще раз.')
