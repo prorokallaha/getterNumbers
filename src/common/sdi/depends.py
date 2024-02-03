@@ -2,13 +2,20 @@ from __future__ import annotations
 
 import asyncio
 import inspect
-from typing import Annotated, Any, Callable, Dict, Union, get_origin
+from typing import (
+    Annotated,
+    Any,
+    Dict,
+    Generic,
+    cast,
+    get_origin,
+)
 
 from src.common.sdi.container import DependencyContainer, DependencyType, KeyType
 from src.common.sdi.exits import AsyncExit, SyncExit
 
 
-class Depends:
+class Depends(Generic[KeyType, DependencyType]):
     __slots__ = (
         "_container",
         "_dependency",
@@ -16,13 +23,18 @@ class Depends:
         "_cache",
     )
 
-    def __init__(self, dependency: KeyType, *, use_cache: bool = False) -> None:
+    def __init__(
+        self,
+        dependency: KeyType,
+        *,
+        use_cache: bool = False,
+    ) -> None:
         self._container = DependencyContainer()
-        self._dependency = self._extract_dep_type(dependency)
+        self._dependency = dependency
         self._use_cache = use_cache
-        self._cache = {}
+        self._cache: Dict[KeyType, DependencyType] = {}
 
-    async def resolve_async(self) -> Any:
+    async def resolve_async(self) -> DependencyType:
         if self._dependency in self._cache:
             return self._cache[self._dependency]
         dependency = self._container[self._dependency]
@@ -42,9 +54,9 @@ class Depends:
         if self._use_cache:
             self._cache[self._dependency] = result
 
-        return result
+        return cast(DependencyType, result)
 
-    def resolve_sync(self) -> Any:
+    def resolve_sync(self) -> DependencyType:
         if self._dependency in self._cache:
             return self._cache[self._dependency]
 
@@ -63,16 +75,7 @@ class Depends:
         if self._use_cache:
             self._cache[self._dependency] = result
 
-        return result
-
-    def _extract_dep_type(
-        self, dependency: KeyType
-    ) -> Union[DependencyType, Callable[..., DependencyType]]:
-        if hasattr(dependency, "__metadata__") and dependency.__metadata__:
-            metadata = dependency.__metadata__[0]
-            if isinstance(metadata, Depends):
-                return metadata._dependency
-        return dependency
+        return cast(DependencyType, result)
 
 
 def _resolve_sync_signature(

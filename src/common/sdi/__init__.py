@@ -3,9 +3,14 @@ import inspect
 from functools import wraps
 from typing import (
     Any,
+    AsyncIterator,
+    Awaitable,
     Callable,
-    Coroutine,
+    Iterator,
+    ParamSpec,
+    TypeVar,
     Union,
+    overload,
 )
 
 import src.common.sdi.depends as depends
@@ -18,34 +23,75 @@ __all__ = (
     "inject",
 )
 
+R = TypeVar("R")
+P = ParamSpec("P")
+
 
 def Depends(dependency: KeyType, *, use_cache: bool = False) -> Any:
     return depends.Depends(dependency, use_cache=use_cache)
 
 
-def inject(
-    _call: Union[Callable[..., Coroutine[Any, Any, Any]], Callable[..., Any]],
-) -> Any:
-    origin_signature = inspect.signature(_call)
+@overload
+def inject(coro: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
+    ...
 
-    @wraps(_call)
-    def _wrapper(*args: Any, **kwargs: Any) -> Any:
-        resolved_sig = depends._resolve_sync_signature(origin_signature)
+
+@overload
+def inject(
+    coro: Callable[P, AsyncIterator[R]],
+) -> Callable[P, Awaitable[AsyncIterator[R]]]:
+    ...
+
+
+@overload
+def inject(func: Callable[P, Iterator[R]]) -> Callable[P, Iterator[R]]:
+    ...
+
+
+@overload
+def inject(func: Callable[P, R]) -> Callable[P, R]:
+    ...
+
+
+def inject(func_or_coro: Any) -> Any:  # type: ignore
+    origin_signature = inspect.signature(func_or_coro)
+    is_async = asyncio.iscoroutinefunction(func_or_coro) or inspect.isasyncgenfunction(
+        func_or_coro
+    )
+
+    if is_async:
+        return wrap_async_injection(func_or_coro, origin_signature)
+    else:
+        return wrap_sync_injection(func_or_coro, origin_signature)
+
+
+def wrap_sync_injection(
+    func: Callable[P, Union[R, Iterator[R]]], signature: inspect.Signature
+) -> Callable[P, Union[R, Iterator[R]]]:
+    @wraps(func)
+    def _wrapper(*args: P.args, **kwargs: P.kwargs) -> Union[R, Iterator[R]]:
+        resolved_sig = depends._resolve_sync_signature(signature)
         kw = {**kwargs, **resolved_sig}
         with SyncExit():
-            return _call(*args, **kw)
+            return func(*args, **kw)
 
-    @wraps(_call)
-    async def _async_wrapper(*args: Any, **kwargs: Any) -> Any:
-        resolved_sig = await depends._resolve_async_signature(origin_signature)
+    return _wrapper
+
+
+def wrap_async_injection(
+    coro: Union[Callable[P, Awaitable[R]], Callable[P, AsyncIterator[R]]],
+    signature: inspect.Signature,
+) -> Callable[P, Awaitable[Union[R, AsyncIterator[R]]]]:
+    @wraps(coro)
+    async def _async_wrapper(
+        *args: P.args, **kwargs: P.kwargs
+    ) -> Union[R, AsyncIterator[R]]:
+        resolved_sig = await depends._resolve_async_signature(signature)
         kw = {**kwargs, **resolved_sig}
         async with AsyncExit():
-            if inspect.isasyncgenfunction(_call):
-                return _call(*args, **kw)
-            return await _call(*args, **kw)
+            if inspect.isasyncgenfunction(coro):
+                return coro(*args, **kw)
+            else:
+                return await coro(*args, **kw)  # type: ignore
 
-    is_async = asyncio.iscoroutinefunction(_call) or inspect.isasyncgenfunction(_call)
-    if is_async:
-        return _async_wrapper
-    else:
-        return _wrapper
+    return _async_wrapper

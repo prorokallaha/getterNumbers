@@ -1,4 +1,4 @@
-from typing import Annotated, Union
+from typing import Union
 
 from aiogram import types
 from aiogram.filters import Filter
@@ -12,11 +12,10 @@ class IsAdmin(Filter):
         self,
         event: Union[types.CallbackQuery, types.Message],
     ) -> bool:
-        return event.from_user.id in self.settings.bot.admins
+        return event.from_user.id in self.settings().bot.admins
 
-    @property
     @inject
     def settings(
-        self, settings: Annotated[Settings, Depends(Settings, use_cache=True)]
+        self, settings: Settings = Depends(Settings, use_cache=True)
     ) -> Settings:
         return settings
