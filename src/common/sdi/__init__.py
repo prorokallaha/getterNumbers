@@ -58,12 +58,12 @@ def inject(__func_or_coro: Any) -> Any:
     ) or inspect.isasyncgenfunction(__func_or_coro)
 
     if is_async:
-        return wrap_async_injection(__func_or_coro, origin_signature)
+        return _wrap_async_injection(__func_or_coro, origin_signature)
     else:
-        return wrap_sync_injection(__func_or_coro, origin_signature)
+        return _wrap_sync_injection(__func_or_coro, origin_signature)
 
 
-def wrap_sync_injection(
+def _wrap_sync_injection(
     func: Callable[P, Union[R, Iterator[R]]], signature: inspect.Signature
 ) -> Callable[P, Union[R, Iterator[R]]]:
     @wraps(func)
@@ -76,7 +76,7 @@ def wrap_sync_injection(
     return _wrapper
 
 
-def wrap_async_injection(
+def _wrap_async_injection(
     coro: Union[Callable[P, Awaitable[R]], Callable[P, AsyncIterator[R]]],
     signature: inspect.Signature,
 ) -> Callable[P, Awaitable[Union[R, AsyncIterator[R]]]]:
