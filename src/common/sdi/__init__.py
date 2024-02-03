@@ -32,37 +32,35 @@ def Depends(dependency: KeyType, *, use_cache: bool = False) -> Any:
 
 
 @overload
-def inject(coro: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
+def inject(__coro: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
     ...
 
 
 @overload
-def inject(
-    coro: Callable[P, AsyncIterator[R]],
-) -> Callable[P, Awaitable[AsyncIterator[R]]]:
+def inject(__coro: Callable[P, AsyncIterator[R]]) -> Callable[P, AsyncIterator[R]]:
     ...
 
 
 @overload
-def inject(func: Callable[P, Iterator[R]]) -> Callable[P, Iterator[R]]:
+def inject(__func: Callable[P, Iterator[R]]) -> Callable[P, Iterator[R]]:
     ...
 
 
 @overload
-def inject(func: Callable[P, R]) -> Callable[P, R]:
+def inject(__func: Callable[P, R]) -> Callable[P, R]:
     ...
 
 
-def inject(func_or_coro: Any) -> Any:  # type: ignore
-    origin_signature = inspect.signature(func_or_coro)
-    is_async = asyncio.iscoroutinefunction(func_or_coro) or inspect.isasyncgenfunction(
-        func_or_coro
-    )
+def inject(__func_or_coro: Any) -> Any:
+    origin_signature = inspect.signature(__func_or_coro)
+    is_async = asyncio.iscoroutinefunction(
+        __func_or_coro
+    ) or inspect.isasyncgenfunction(__func_or_coro)
 
     if is_async:
-        return wrap_async_injection(func_or_coro, origin_signature)
+        return wrap_async_injection(__func_or_coro, origin_signature)
     else:
-        return wrap_sync_injection(func_or_coro, origin_signature)
+        return wrap_sync_injection(__func_or_coro, origin_signature)
 
 
 def wrap_sync_injection(
