@@ -41,7 +41,7 @@ async def paginate_users_callback(
         offset: int,
         limit: int,
         gateway: Annotated[DatabaseGateway, Depends(SessionGatewayMarker)],
-    ) -> Sequence[Any]:
+    ) -> Sequence[models.User]:
         return await gateway.user().reader().select_many(limit=limit, offset=offset)
 
     data = pagination.add(
@@ -51,6 +51,8 @@ async def paginate_users_callback(
         "Users",
         page,
     )
+    if not await data.is_next_data_exists():
+        data._page = 0
 
     buttons = [paginated_user_button(user) for user in await data.next()]
     if buttons:
