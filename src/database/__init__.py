@@ -1,3 +1,5 @@
+from typing import AsyncIterator
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.core.gateway import DatabaseGateway, database_gateway_factory
@@ -13,13 +15,13 @@ __all__ = (
 )
 
 
-async def transaction_gateway(session: AsyncSession) -> DatabaseGateway:
+async def transaction_gateway(session: AsyncSession) -> AsyncIterator[DatabaseGateway]:
     gateway = database_gateway_factory(sa_unit_of_work_factory(session))
     async with gateway:
         yield gateway
 
 
-async def session_gateway(session: AsyncSession) -> DatabaseGateway:
+async def session_gateway(session: AsyncSession) -> AsyncIterator[DatabaseGateway]:
     gateway = database_gateway_factory(sa_unit_of_work_factory(session))
     async with session:
         yield gateway
