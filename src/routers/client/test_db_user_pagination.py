@@ -56,10 +56,10 @@ async def paginate_users_callback(
 
     buttons = [paginated_user_button(user) for user in await data.next()]
     if buttons:
-        if await data.is_next_data_exists():
-            buttons += [next_pagination_button()]
         if await data.is_previous_data_exists():
             buttons += [previous_pagination_button()]
+        if await data.is_next_data_exists():
+            buttons += [next_pagination_button()]
         buttons += [back_button()]
     else:
         buttons += [back_button()]

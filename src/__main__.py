@@ -33,7 +33,7 @@ from src.utils.logger import Logger
 
 
 async def main() -> None:
-    logger = Logger("bot", level=logging.DEBUG) # in debug mode
+    logger = Logger("bot", level=logging.DEBUG)  # in debug mode
     settings = load_settings()
 
     engine = create_sa_engine(settings.db.url)
@@ -46,6 +46,7 @@ async def main() -> None:
     storage = load_storage(settings)
     bot = load_bot(settings)
     dispatcher = load_dispatcher(storage)
+    await bot.delete_webhook(drop_pending_updates=True)
     register_routers(router, client_router, admin_router)
     register_middlewares(
         router, ThrottlingMiddleware(storage), ErrorMiddleware(logger), is_outer=True

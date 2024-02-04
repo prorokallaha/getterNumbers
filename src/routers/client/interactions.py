@@ -74,6 +74,6 @@ async def previous_data_callback(
         buttons += [previous_pagination_button()]
         buttons += [next_pagination_button(), back_button()]
     else:
-        buttons += [back_button(), next_pagination_button()]
+        buttons += [next_pagination_button(), back_button()]
 
     await safe_edit_message(call, text=data.text, reply_markup=build_markup(buttons))

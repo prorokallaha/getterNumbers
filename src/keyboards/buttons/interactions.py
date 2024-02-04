@@ -8,8 +8,8 @@ def back_button() -> Dict[str, str]:
 
 
 def next_pagination_button() -> Dict[str, str]:
-    return button(text="Next", callback_data="next")
+    return button(text=">>", callback_data="next")
 
 
 def previous_pagination_button() -> Dict[str, str]:
-    return button(text="Previous", callback_data="previous")
+    return button(text="<<", callback_data="previous")
