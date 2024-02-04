@@ -12,7 +12,10 @@ from src.database import DatabaseGateway
 from src.filters import IsChatType
 from src.keyboards import build_markup, button
 from src.routers.client.router import client_router
-from src.utils.interactions import BackButtonReturnType, DatabaseDataPaginationMediator
+from src.utils.interactions import (
+    ChatFunctionPagination,
+    DatabaseDataPaginationMediator,
+)
 from src.utils.logger import Logger
 
 
@@ -23,10 +26,11 @@ async def start_message(  # should be endswith _message if we want to use chat_s
     user: types.User,
     gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
     pagination: DatabaseDataPaginationMediator,
+    chat: ChatFunctionPagination,
     state: FSMContext,
     logger: Logger,
     **_: Any,  # this is important thing everywhere to chat capability
-) -> BackButtonReturnType:
+) -> None:
     logger.debug(f"User {user.username or user.id} in start_message menu")
     repository = gateway.user()
     is_user_exists = await repository.reader().exists(user.id)
@@ -51,6 +55,5 @@ async def start_message(  # should be endswith _message if we want to use chat_s
         ),
     )
     pagination.clear(user.id)
+    chat.set_message(user.id, start_message, True)
     await state.set_state()  # Reset all states if user send /start command
-
-    return start_message
