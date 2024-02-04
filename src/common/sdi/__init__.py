@@ -15,7 +15,6 @@ from typing import (
 
 import src.common.sdi.depends as depends
 from src.common.sdi.container import DependencyContainer, KeyType
-from src.common.sdi.exits import AsyncExit, SyncExit
 
 __all__ = (
     "DependencyContainer",
@@ -68,10 +67,13 @@ def _wrap_sync_injection(
 ) -> Callable[P, Union[R, Iterator[R]]]:
     @wraps(func)
     def _wrapper(*args: P.args, **kwargs: P.kwargs) -> Union[R, Iterator[R]]:
-        resolved_sig = depends._resolve_sync_signature(signature)
+        exits, resolved_sig = depends._resolve_sync_signature(signature)
         kw = {**kwargs, **resolved_sig}
-        with SyncExit():
+        try:
             return func(*args, **kw)
+        finally:
+            for _exit in exits:
+                _exit.close()
 
     return _wrapper
 
@@ -84,12 +86,15 @@ def _wrap_async_injection(
     async def _async_wrapper(
         *args: P.args, **kwargs: P.kwargs
     ) -> Union[R, AsyncIterator[R]]:
-        resolved_sig = await depends._resolve_async_signature(signature)
+        exits, resolved_sig = await depends._resolve_async_signature(signature)
         kw = {**kwargs, **resolved_sig}
-        async with AsyncExit():
+        try:
             if inspect.isasyncgenfunction(coro):
                 return coro(*args, **kw)
             else:
                 return await coro(*args, **kw)  # type: ignore
+        finally:
+            for _exit in exits:
+                await _exit.aclose()
 
     return _async_wrapper

@@ -3,12 +3,12 @@ from __future__ import annotations
 import inspect
 from typing import Any
 
-from src.common.sdi._meta import Singleton
 
+class SyncExit:
+    __slots__ = ("gens",)
 
-class SyncExit(metaclass=Singleton):
-    exits = {}
-    depends = []
+    def __init__(self) -> None:
+        self.gens = []
 
     def __enter__(self) -> SyncExit:
         return self
@@ -17,11 +17,7 @@ class SyncExit(metaclass=Singleton):
         self.close()
 
     def close(self) -> None:
-        for dep in reversed(self.depends):
-            gen = self.exits.pop(dep, None)
-            if gen is None:
-                continue
-            self.depends.remove(dep)
+        for gen in reversed(self.gens):
             try:
                 if inspect.isgenerator(gen):
                     next(gen)
@@ -29,9 +25,11 @@ class SyncExit(metaclass=Singleton):
                 pass
 
 
-class AsyncExit(metaclass=Singleton):
-    exits = {}
-    depends = []
+class AsyncExit:
+    __slots__ = ("gens",)
+
+    def __init__(self) -> None:
+        self.gens = []
 
     async def __aenter__(self) -> AsyncExit:
         return self
@@ -40,11 +38,7 @@ class AsyncExit(metaclass=Singleton):
         await self.aclose()
 
     async def aclose(self) -> None:
-        for dep in reversed(self.depends):
-            gen = self.exits.pop(dep, None)
-            if gen is None:
-                continue
-            self.depends.remove(dep)
+        for gen in reversed(self.gens):
             try:
                 if inspect.isasyncgen(gen):
                     await anext(gen)

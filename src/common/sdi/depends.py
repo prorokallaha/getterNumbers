@@ -2,14 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
-from typing import (
-    Annotated,
-    Any,
-    Dict,
-    Generic,
-    cast,
-    get_origin,
-)
+from typing import Annotated, Any, Dict, Generic, List, Tuple, cast, get_origin
 
 from src.common.sdi.container import DependencyContainer, DependencyType, KeyType
 from src.common.sdi.exits import AsyncExit, SyncExit
@@ -21,6 +14,8 @@ class Depends(Generic[KeyType, DependencyType]):
         "_dependency",
         "_use_cache",
         "_cache",
+        "_async_exit",
+        "_sync_exit",
     )
 
     def __init__(
@@ -33,6 +28,8 @@ class Depends(Generic[KeyType, DependencyType]):
         self._dependency = dependency
         self._use_cache = use_cache
         self._cache: Dict[KeyType, DependencyType] = {}
+        self._async_exit = AsyncExit()
+        self._sync_exit = SyncExit()
 
     async def resolve_async(self) -> DependencyType:
         if self._dependency in self._cache:
@@ -43,11 +40,13 @@ class Depends(Generic[KeyType, DependencyType]):
 
         if callable(dependency):
             result = dependency()
-            if asyncio.iscoroutine(result):
+            if inspect.isgenerator(result):
+                self._async_exit.gens.append(result)
+                result = next(result)
+            elif asyncio.iscoroutine(result):
                 result = await result
             elif inspect.isasyncgen(result):
-                AsyncExit.exits[self] = result
-                AsyncExit.depends.append(self)
+                self._async_exit.gens.append(result)
                 result = await anext(result)
         else:
             result = dependency
@@ -68,8 +67,7 @@ class Depends(Generic[KeyType, DependencyType]):
         if callable(dependency):
             result = dependency()
             if inspect.isgenerator(result):
-                SyncExit.exits[self] = result
-                SyncExit.depends.append(self)
+                self._sync_exit.gens.append(result)
                 result = next(result)
         else:
             result = dependency
@@ -82,32 +80,37 @@ class Depends(Generic[KeyType, DependencyType]):
 
 def _resolve_sync_signature(
     signature: inspect.Signature,
-) -> Dict[str, Any]:
+) -> Tuple[List[SyncExit], Dict[str, Any]]:
     resolved_signature = {}
+    exits = []
     for _, v in signature.parameters.items():
         param = v.default
         if isinstance(param, Depends):
+            exits.append(param._sync_exit)
             resolved_signature[v.name] = param.resolve_sync()
         if get_origin(v.annotation) is Annotated:
             metadata = v.annotation.__metadata__
             if metadata and isinstance(metadata[0], Depends):
+                exits.append(param._sync_exit)
                 resolved_signature[v.name] = metadata[0].resolve_sync()
 
-    return resolved_signature
+    return exits, resolved_signature
 
 
 async def _resolve_async_signature(
     signature: inspect.Signature,
-) -> Dict[str, Any]:
+) -> Tuple[List[AsyncExit], Dict[str, Any]]:
     resolved_signature = {}
+    exits = []
     for _, v in signature.parameters.items():
         param = v.default
         if isinstance(param, Depends):
+            exits.append(param._async_exit)
             resolved_signature[v.name] = await param.resolve_async()
 
         if get_origin(v.annotation) is Annotated:
             metadata = v.annotation.__metadata__
             if metadata and isinstance(metadata[0], Depends):
+                exits.append(param._async_exit)
                 resolved_signature[v.name] = await metadata[0].resolve_async()
-
-    return resolved_signature
+    return exits, resolved_signature
