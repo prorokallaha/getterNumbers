@@ -91,7 +91,7 @@ def _resolve_sync_signature(
         if get_origin(v.annotation) is Annotated:
             metadata = v.annotation.__metadata__
             if metadata and isinstance(metadata[0], Depends):
-                exits.append(param._sync_exit)
+                exits.append(metadata[0]._sync_exit)
                 resolved_signature[v.name] = metadata[0].resolve_sync()
 
     return exits, resolved_signature
@@ -111,6 +111,6 @@ async def _resolve_async_signature(
         if get_origin(v.annotation) is Annotated:
             metadata = v.annotation.__metadata__
             if metadata and isinstance(metadata[0], Depends):
-                exits.append(param._async_exit)
+                exits.append(metadata[0]._async_exit)
                 resolved_signature[v.name] = await metadata[0].resolve_async()
     return exits, resolved_signature
