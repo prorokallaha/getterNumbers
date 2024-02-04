@@ -46,7 +46,8 @@ class Depends(Generic[KeyType, DependencyType]):
             if asyncio.iscoroutine(result):
                 result = await result
             elif inspect.isasyncgen(result):
-                AsyncExit._exits.append(result)
+                AsyncExit.exits[self] = result
+                AsyncExit.depends.append(self)
                 result = await anext(result)
         else:
             result = dependency
@@ -67,7 +68,8 @@ class Depends(Generic[KeyType, DependencyType]):
         if callable(dependency):
             result = dependency()
             if inspect.isgenerator(result):
-                SyncExit._exits.append(result)
+                SyncExit.exits[self] = result
+                SyncExit.depends.append(self)
                 result = next(result)
         else:
             result = dependency

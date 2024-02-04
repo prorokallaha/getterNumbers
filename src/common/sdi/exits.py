@@ -7,7 +7,8 @@ from src.common.sdi._meta import Singleton
 
 
 class SyncExit(metaclass=Singleton):
-    _exits = []
+    exits = {}
+    depends = []
 
     def __enter__(self) -> SyncExit:
         return self
@@ -16,19 +17,21 @@ class SyncExit(metaclass=Singleton):
         self.close()
 
     def close(self) -> None:
-        for gen in reversed(self._exits):
+        for dep in reversed(self.depends):
+            gen = self.exits.pop(dep, None)
+            if gen is None:
+                continue
+            self.depends.remove(dep)
             try:
                 if inspect.isgenerator(gen):
                     next(gen)
             except StopIteration:
                 pass
-            except StopAsyncIteration:
-                pass
-        self._exits.clear()
 
 
 class AsyncExit(metaclass=Singleton):
-    _exits = []
+    exits = {}
+    depends = []
 
     async def __aenter__(self) -> AsyncExit:
         return self
@@ -37,7 +40,11 @@ class AsyncExit(metaclass=Singleton):
         await self.aclose()
 
     async def aclose(self) -> None:
-        for gen in reversed(self._exits):
+        for dep in reversed(self.depends):
+            gen = self.exits.pop(dep, None)
+            if gen is None:
+                continue
+            self.depends.remove(dep)
             try:
                 if inspect.isasyncgen(gen):
                     await anext(gen)
@@ -47,4 +54,3 @@ class AsyncExit(metaclass=Singleton):
                 pass
             except StopAsyncIteration:
                 pass
-        self._exits.clear()
