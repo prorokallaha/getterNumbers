@@ -1,6 +1,6 @@
 from typing import Any
 
-from aiogram import F, types
+from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 
 from src.keyboards import build_markup
@@ -9,7 +9,6 @@ from src.keyboards.buttons import (
     next_pagination_button,
     previous_pagination_button,
 )
-from src.routers.client.router import client_router
 from src.routers.client.start import start_message
 from src.utils.interactions import (
     ChatFunctionPagination,
@@ -19,7 +18,12 @@ from src.utils.interactions import (
 )
 
 
-@client_router.callback_query(F.data == "back")
+def register_interactions(router: Router) -> None:
+    router.callback_query.register(back_callback, F.data == "back")
+    router.callback_query.register(next_data_callback, F.data == "next")
+    router.callback_query.register(previous_data_callback, F.data == "previous")
+
+
 async def back_callback(
     call: types.CallbackQuery,
     chat: ChatFunctionPagination,
@@ -30,7 +34,7 @@ async def back_callback(
     last_message = chat.get_last_message(call.from_user.id)
     if not last_message:
         await safe_delete_message(call)
-        await start_message(
+        await start_message(  # type: ignore
             call.message, chat=chat, state=state, pagination=pagination, **kwargs
         )
     else:
@@ -48,7 +52,6 @@ async def back_callback(
     await state.set_state()
 
 
-@client_router.callback_query(F.data == "next")
 async def next_data_callback(
     call: types.CallbackQuery, pagination: DatabaseDataPaginationMediator
 ) -> None:
@@ -63,7 +66,6 @@ async def next_data_callback(
     await safe_edit_message(call, text=data.text, reply_markup=build_markup(buttons))
 
 
-@client_router.callback_query(F.data == "previous")
 async def previous_data_callback(
     call: types.CallbackQuery, pagination: DatabaseDataPaginationMediator
 ) -> None:

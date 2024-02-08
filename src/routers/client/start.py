@@ -1,6 +1,6 @@
 from typing import Annotated, Any
 
-from aiogram import types
+from aiogram import Router, types
 from aiogram.enums.chat_type import ChatType
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
@@ -11,26 +11,28 @@ from src.common.sdi import Depends, inject
 from src.database import DatabaseGateway
 from src.filters import IsChatType
 from src.keyboards import build_markup, button
-from src.routers.client.router import client_router
 from src.utils.interactions import (
-    ChatFunctionPagination,
+    BackButtonReturnType,
     DatabaseDataPaginationMediator,
 )
 from src.utils.logger import Logger
 
 
-@client_router.message(CommandStart(), IsChatType(ChatType.PRIVATE))
+def register_start(router: Router) -> None:
+    router.message.register(start_message, CommandStart(), IsChatType(ChatType.PRIVATE))
+
+
+# @client_router.message(CommandStart(), IsChatType(ChatType.PRIVATE))
 @inject  # whenever you want to use Depends, you should wrap it
 async def start_message(  # should be endswith _message if we want to use chat_stack or _callback for callbacks
     message: types.Message,
     user: types.User,
     gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
     pagination: DatabaseDataPaginationMediator,
-    chat: ChatFunctionPagination,
     state: FSMContext,
     logger: Logger,
     **_: Any,  # this is important thing everywhere to chat capability
-) -> None:
+) -> BackButtonReturnType:
     logger.debug(f"User {user.username or user.id} in start_message menu")
     repository = gateway.user()
     is_user_exists = await repository.reader().exists(user.id)
@@ -55,5 +57,5 @@ async def start_message(  # should be endswith _message if we want to use chat_s
         ),
     )
     pagination.clear(user.id)
-    chat.set_message(user.id, start_message, True)
+    return start_message
     await state.set_state()  # Reset all states if user send /start command

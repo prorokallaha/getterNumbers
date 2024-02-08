@@ -1,1 +1,10 @@
-from src.routers.admin.router import admin_router as admin_router
+from typing import Optional
+
+from aiogram import Router
+
+
+def register_admin_router(router: Optional[Router] = None) -> Router:
+    if router is None:
+        router = Router(name="admin")
+
+    return router

@@ -26,8 +26,8 @@ from src.middlewares import (
     register_middlewares,
 )
 from src.routers import register_routers
-from src.routers.admin.router import admin_router
-from src.routers.client.router import client_router
+from src.routers.admin import register_admin_router
+from src.routers.client import register_client_router
 from src.utils.interactions import DatabaseDataPaginationMediator
 from src.utils.logger import Logger
 
@@ -47,7 +47,7 @@ async def main() -> None:
     bot = load_bot(settings)
     dispatcher = load_dispatcher(storage)
     await bot.delete_webhook(drop_pending_updates=True)
-    register_routers(router, client_router, admin_router)
+    register_routers(router, register_client_router(), register_admin_router())
     register_middlewares(
         router, ThrottlingMiddleware(storage), ErrorMiddleware(logger), is_outer=True
     )

@@ -1,6 +1,6 @@
 from typing import Annotated, Any, Dict, Sequence
 
-from aiogram import F, types
+from aiogram import F, Router, types
 
 import src.database.models as models
 from src.common.markers import SessionGatewayMarker
@@ -12,12 +12,18 @@ from src.keyboards.buttons import (
     next_pagination_button,
     previous_pagination_button,
 )
-from src.routers.client.router import client_router
 from src.utils.interactions import (
     BackButtonReturnType,
     DatabaseDataPaginationMediator,
     safe_edit_message,
 )
+
+
+def register_test_pagination(router: Router) -> None:
+    router.callback_query.register(paginate_users_callback, F.data == "paginate_users")
+    router.callback_query.register(
+        paginated_user_callback, F.data.regexp(r"paginated_user:+")
+    )
 
 
 def paginated_user_button(user: models.User) -> Dict[str, Any]:
@@ -26,7 +32,6 @@ def paginated_user_button(user: models.User) -> Dict[str, Any]:
     )
 
 
-@client_router.callback_query(F.data == "paginate_users")
 async def paginate_users_callback(
     call: types.CallbackQuery, pagination: DatabaseDataPaginationMediator, **_: Any
 ) -> BackButtonReturnType:
@@ -68,7 +73,6 @@ async def paginate_users_callback(
     return paginate_users_callback
 
 
-@client_router.callback_query(F.data.regexp(r"paginated_user:+"))
 @inject
 async def paginated_user_callback(
     call: types.CallbackQuery,

@@ -1,19 +1,24 @@
 from typing import Any
 
-from aiogram import F, types
+from aiogram import F, Router, types
 
 from src.keyboards import build_markup, button
 from src.keyboards.buttons import (
     back_button,
 )
-from src.routers.client.router import client_router
 from src.utils.interactions import (
     BackButtonReturnType,
     safe_edit_message,
 )
 
 
-@client_router.callback_query(F.data == "inner_chat_test")
+def register_test_chat(router: Router) -> None:
+    router.callback_query.register(inner_chat_callback, F.data == "inner_chat_test")
+    router.callback_query.register(inner_chat_2_callback, F.data == "inner_chat_test_2")
+    router.callback_query.register(inner_chat_3_callback, F.data == "inner_chat_test_3")
+    router.callback_query.register(inner_chat_4_callback, F.data == "inner_chat_test_4")
+
+
 async def inner_chat_callback(
     call: types.CallbackQuery, **_: Any
 ) -> BackButtonReturnType:
@@ -30,7 +35,6 @@ async def inner_chat_callback(
     return inner_chat_callback
 
 
-@client_router.callback_query(F.data == "inner_chat_test_2")
 async def inner_chat_2_callback(
     call: types.CallbackQuery, **_: Any
 ) -> BackButtonReturnType:
@@ -47,7 +51,6 @@ async def inner_chat_2_callback(
     return inner_chat_2_callback
 
 
-@client_router.callback_query(F.data == "inner_chat_test_3")
 async def inner_chat_3_callback(
     call: types.CallbackQuery, **_: Any
 ) -> BackButtonReturnType:
@@ -64,7 +67,6 @@ async def inner_chat_3_callback(
     return inner_chat_3_callback
 
 
-@client_router.callback_query(F.data == "inner_chat_test_4")
 async def inner_chat_4_callback(
     call: types.CallbackQuery, **_: Any
 ) -> BackButtonReturnType:
