@@ -21,7 +21,7 @@ class UserCreate(BaseModel):
 class UserUpdate(BaseModel):
 
     is_bot: Optional[bool] = None
-    first_name: Optional[bool] = None
+    first_name: Optional[str] = None
     username: Optional[str] = None
     last_name: Optional[str] = None
     language_code: Optional[str] = None

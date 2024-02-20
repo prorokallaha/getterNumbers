@@ -1,7 +1,7 @@
 from typing import Any, Awaitable, Callable, Dict
 
 from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject
+from aiogram.types import CallbackQuery, Message, TelegramObject
 
 from src.utils.interactions.chat import ChatFunctionPagination
 
@@ -20,4 +20,9 @@ class ChatMiddleware(BaseMiddleware):
         data["user"] = event.from_user  # type: ignore
         result = await handler(event, data)
         if result:
-            self._chat.set_message(event.from_user.id, result)  # type: ignore
+            if isinstance(event, CallbackQuery):
+                self._chat.set_message(
+                    f"{event.from_user.id}:{event.message.chat.id}", result
+                )
+            if isinstance(event, Message):
+                self._chat.set_message(f"{event.from_user.id}:{event.chat.id}", result)

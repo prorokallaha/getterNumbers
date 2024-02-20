@@ -47,7 +47,7 @@ class ChatFunctionPagination:
 
     def get_last_message(
         self,
-        user_id: int,
+        user_id: Union[int, str],
     ) -> Optional[BackButtonReturnType]:
         last_message_func_stack: List[BackButtonReturnType]
         last_message_func_stack = self.users.get(user_id, [])
@@ -62,7 +62,7 @@ class ChatFunctionPagination:
 
     def set_message(
         self,
-        user_id: int,
+        user_id: Union[int, str],
         func: BackButtonReturnType,
         start_message: bool = False,
     ) -> None:

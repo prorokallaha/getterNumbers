@@ -5,7 +5,7 @@ from aiogram.enums.chat_type import ChatType
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 
-from src.common.dto import UserCreate
+from src.common.dto import UserCreate, UserUpdate
 from src.common.markers import TransactionGatewayMarker
 from src.common.sdi import Depends, inject
 from src.database import DatabaseGateway
@@ -22,7 +22,6 @@ def register_start(router: Router) -> None:
     router.message.register(start_message, CommandStart(), IsChatType(ChatType.PRIVATE))
 
 
-# @client_router.message(CommandStart(), IsChatType(ChatType.PRIVATE))
 @inject  # whenever you want to use Depends, you should wrap it
 async def start_message(  # should be endswith _message if we want to use chat_stack or _callback for callbacks
     message: types.Message,
@@ -41,8 +40,11 @@ async def start_message(  # should be endswith _message if we want to use chat_s
     if not is_user_exists:
         await repository.writer().create(
             UserCreate(**user.model_dump())
-        )  # creating a user and put him to db if does not exists
-
+        )  # creating a user and put him to db if not exists
+    else:
+        await repository.writer().update(
+            user_id=user.id, query=UserUpdate(**user.model_dump(exclude={"id"}))
+        )  # or updating it instead
     await message.answer(
         "Test",
         reply_markup=build_markup(
@@ -57,5 +59,5 @@ async def start_message(  # should be endswith _message if we want to use chat_s
         ),
     )
     pagination.clear(user.id)
-    return start_message
     await state.set_state()  # Reset all states if user send /start command
+    return start_message

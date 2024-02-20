@@ -31,7 +31,7 @@ async def back_callback(
     state: FSMContext,
     **kwargs: Any,
 ) -> None:
-    last_message = chat.get_last_message(call.from_user.id)
+    last_message = chat.get_last_message(f"{call.from_user.id}:{call.message.chat.id}")
     if not last_message:
         await safe_delete_message(call)
         await start_message(  # type: ignore
