@@ -50,9 +50,9 @@ services:
       - app-network
 
 
-
-volumes:
-  postgres_data:
+# for postgres
+# volumes:
+#   postgres_data:
 
 networks:
   app-network:

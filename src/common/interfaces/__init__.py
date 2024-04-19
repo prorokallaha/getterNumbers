@@ -1,8 +1,11 @@
 from src.common.interfaces.crud import AbstractCRUDRepository
-from src.common.interfaces.unit_of_work import AbstractUnitOfWork, UnitOfWork
+from src.common.interfaces.manager import (
+    AbstractTransactionManager,
+    TransactionManager,
+)
 
 __all__ = (
     "AbstractCRUDRepository",
-    "UnitOfWork",
-    "AbstractUnitOfWork",
+    "TransactionManager",
+    "AbstractTransactionManager",
 )

@@ -52,9 +52,8 @@ class ChatFunctionPagination:
         last_message_func_stack: List[BackButtonReturnType]
         last_message_func_stack = self.users.get(user_id, [])
         stack_length = len(last_message_func_stack)
-        if stack_length == 1:
-            return last_message_func_stack[-1]
-        elif stack_length == 0:
+
+        if stack_length <= 1:
             return None
 
         last_message_func_stack.pop()

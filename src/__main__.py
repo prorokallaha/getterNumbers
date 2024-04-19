@@ -3,6 +3,7 @@ import logging
 
 from aiogram import Router
 
+from src.common.logger import Logger
 from src.common.markers import SessionGatewayMarker, TransactionGatewayMarker
 from src.common.sdi import DependencyContainer
 from src.core import (
@@ -14,9 +15,9 @@ from src.core import (
 )
 from src.database import (
     database_gateway_factory,
-    sa_unit_of_work_factory,
     session_gateway,
     transaction_gateway,
+    transaction_manager_factory,
 )
 from src.database.core.connection import create_sa_engine, create_sa_session_factory
 from src.middlewares import (
@@ -29,7 +30,6 @@ from src.routers import register_routers
 from src.routers.admin import register_admin_router
 from src.routers.client import register_client_router
 from src.utils.interactions import DatabaseDataPaginationMediator
-from src.utils.logger import Logger
 
 
 async def main() -> None:
@@ -62,7 +62,7 @@ async def main() -> None:
             settings=settings,
             pagination=DatabaseDataPaginationMediator(),
             gateway=lambda: database_gateway_factory(
-                sa_unit_of_work_factory(session_factory())
+                transaction_manager_factory(session_factory())
             ),
         )
     finally:

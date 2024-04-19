@@ -47,7 +47,7 @@ async def paginate_users_callback(
         limit: int,
         gateway: Annotated[DatabaseGateway, Depends(SessionGatewayMarker)],
     ) -> Sequence[models.User]:
-        return await gateway.user().reader().select_many(limit=limit, offset=offset)
+        return await gateway.user().select_many(limit=limit, offset=offset)
 
     data = pagination.add(
         call.from_user.id,
@@ -80,7 +80,7 @@ async def paginated_user_callback(
     **_: Any,
 ) -> BackButtonReturnType:
     user_id = int(call.data.split(":")[-1])
-    user = await gateway.user().reader().select(user_id)
+    user = await gateway.user().select(user_id)
     await safe_edit_message(
         call,
         text=f"ID: {user.id}\nUsername: {user.username}\nIsBot: {user.is_bot}\nHasPremium{user.is_premium}",

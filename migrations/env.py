@@ -1,9 +1,12 @@
 import asyncio
 from logging.config import fileConfig
-from typing import no_type_check
+from typing import Iterable, List, Optional, Union, no_type_check
 
 import nest_asyncio  # type: ignore
 from alembic import context
+from alembic.operations.ops import MigrationScript
+from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 
@@ -16,6 +19,21 @@ config = context.config
 config.set_main_option("sqlalchemy.url", load_settings().db.url)
 
 fileConfig(config.config_file_name)  # type: ignore
+
+
+def add_number_to_migrations(
+    context: MigrationContext,
+    revision: Union[str, Iterable[Optional[str]]],
+    directives: List[MigrationScript],
+) -> None:
+    migration_script = directives[0]
+    head_revision = ScriptDirectory.from_config(context.config).get_current_head()  # type: ignore
+    if head_revision is None:
+        new_rev_id = 1
+    else:
+        last_rev_id = int(head_revision.split("_")[0])
+        new_rev_id = last_rev_id + 1
+    migration_script.rev_id = f"{new_rev_id:02}_{migration_script.rev_id}"
 
 
 def run_migrations_offline() -> None:
@@ -51,6 +69,7 @@ def do_run_migrations(connection: AsyncConnection) -> None:
         compare_type=True,
         render_as_batch=True,
         include_schemas=True,
+        process_revision_directives=add_number_to_migrations,
     )
 
     with context.begin_transaction():
