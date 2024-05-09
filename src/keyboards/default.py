@@ -16,6 +16,7 @@ def default_keyboard(
         **kwargs
     )
 
+
 def get_default_button(
         text: str,
         **kwargs: Any

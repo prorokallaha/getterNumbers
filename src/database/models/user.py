@@ -5,13 +5,14 @@ from sqlalchemy import (
     Boolean,
     String,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models.base import Base
 from src.database.models.base.mixins import ModelWithTimeMixin
 
 
 class User(ModelWithTimeMixin, Base):
+    __tablename__ = 'users'
     id: Mapped[int] = mapped_column(
         BigInteger,
         primary_key=True,
@@ -20,6 +21,7 @@ class User(ModelWithTimeMixin, Base):
     is_bot: Mapped[bool]
     first_name: Mapped[str]
     username: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    number: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     last_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     language_code: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     is_premium: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
@@ -33,3 +35,7 @@ class User(ModelWithTimeMixin, Base):
     supports_inline_queries: Mapped[Optional[bool]] = mapped_column(
         Boolean, nullable=True
     )
+    messages = relationship("Messages", back_populates="user", cascade="all, delete-orphan")
+
+
+

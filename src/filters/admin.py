@@ -12,6 +12,8 @@ class IsAdmin(Filter):
         self,
         event: Union[types.CallbackQuery, types.Message],
     ) -> bool:
+        settings = self.settings()
+        print(f"Checking if {event.from_user.id} is in {settings.bot.admins}")
         return event.from_user.id in self.settings().bot.admins
 
     @inject

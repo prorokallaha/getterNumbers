@@ -22,18 +22,19 @@ fileConfig(config.config_file_name)  # type: ignore
 
 
 def add_number_to_migrations(
-    context: MigrationContext,
-    revision: Union[str, Iterable[Optional[str]]],
-    directives: List[MigrationScript],
+        context: MigrationContext,
+        revision: Union[str, Iterable[Optional[str]]],
+        directives: List[MigrationScript],
 ) -> None:
     migration_script = directives[0]
     head_revision = ScriptDirectory.from_config(context.config).get_current_head()  # type: ignore
     if head_revision is None:
-        new_rev_id = 1
+        new_rev_id = "001"
     else:
-        last_rev_id = int(head_revision.split("_")[0])
-        new_rev_id = last_rev_id + 1
-    migration_script.rev_id = f"{new_rev_id:02}_{migration_script.rev_id}"
+        last_rev_id = int(head_revision.split("_")[0], 16)  # Преобразование из шестнадцатеричного формата
+        new_rev_id = hex(last_rev_id + 1)[2:].zfill(12)  # Преобразование обратно в шестнадцатеричный формат
+    migration_script.rev_id = f"{new_rev_id}_{migration_script.rev_id}"
+
 
 
 def run_migrations_offline() -> None:

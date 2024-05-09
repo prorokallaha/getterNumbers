@@ -22,6 +22,7 @@ def get_inline_button(
         **kwargs
     )
 
+
 def inline_keyboard(
         inline_buttons: List[List[types.InlineKeyboardButton]]
 ) -> types.InlineKeyboardMarkup:

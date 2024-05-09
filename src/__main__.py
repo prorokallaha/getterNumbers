@@ -47,7 +47,7 @@ async def main() -> None:
     bot = load_bot(settings)
     dispatcher = load_dispatcher(storage)
     await bot.delete_webhook(drop_pending_updates=True)
-    register_routers(router, register_client_router(), register_admin_router())
+    register_routers(router, register_admin_router(), register_client_router())
     register_middlewares(
         router, ThrottlingMiddleware(storage), ErrorMiddleware(logger), is_outer=True
     )
