@@ -15,6 +15,9 @@ class UserRepository(BaseRepository[User]):
     async def select(self, user_id: int) -> Optional[models.User]:
         return await self._crud.select(self.model.id == user_id)
 
+    async def select_by_username(self, username: str) -> Optional[models.User]:
+        return await self._crud.select(self.model.username == username)
+
     async def select_many(
         self, limit: Optional[int] = None, offset: Optional[int] = None
     ) -> Sequence[models.User]:

