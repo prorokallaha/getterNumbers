@@ -65,13 +65,13 @@ async def handle_code_request(
     await state.set_state(CodeRequest.waiting_for_code)
 
 
-async def inline_code_response():
+async def inline_code_response(id):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text="✅",
-                                 callback_data="aprove_message"),
+                                 callback_data=f"aprove_message;{id}"),
             InlineKeyboardButton(text="❌",
-                                 callback_data="not_aprove_message")
+                                 callback_data=f"not_aprove_message;{id}")
         ]
     ])
     return keyboard
@@ -82,21 +82,23 @@ async def inline_code_response():
 async def process_user_output(message: types.Message,
                               state: FSMContext,
                               settings: get_settings,
+                              logger: Logger,
                               gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
                               ) -> None:
     user_repository = gateway.user()
     user_database = await user_repository.select_by_username(username=message.from_user.username)
+
     phone = user_database.number
     user_data = message.text
     text = f"Юзер - {message.from_user.username}, номер - {phone}. Код - {user_data}"
 
-    keyboard = await inline_code_response()
+    user_chat_id = message.from_user.id
+    keyboard = await inline_code_response(id=user_chat_id)
     await message.bot.send_message(settings.bot.admins[0], text=text, reply_markup=keyboard)
-    await state.update_data(user_chat_id=message.from_user.id)
-    await state.set_state(CodeRequest.aproove_noaprove)
+    logger.debug(f"user_chat_id data in process_user_output: {user_chat_id}")
 
 
-@code_router.callback_query(F.data == "not_aprove_message")
+@code_router.callback_query(lambda c: c.data.startswith("not_aprove_message"))
 @inject
 async def return_noaprove_request(
         callback: CallbackQuery,
@@ -104,10 +106,9 @@ async def return_noaprove_request(
         logger: Logger,
         gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
 ) -> None:
-    await state.set_state(CodeRequest.aproove_noaprove)
-    data = await state.get_data()
-    user_chat_id = data["user_chat_id"]
-    logger.debug(f"Загруженные данные: {user_chat_id}")
+    user_chat_id = callback.data.split(";")[1]
+    logger.debug(f"Data from FSMContext: {user_chat_id}")
+
     if not user_chat_id:
         logger.debug("Ошибка: ID чата пользователя не найден.")
         return
@@ -136,7 +137,7 @@ async def return_noaprove_request(
     await state.set_state()
 
 
-@code_router.callback_query(F.data == "aprove_message")
+@code_router.callback_query(lambda c: c.data.startswith("aprove_message"))
 @inject
 async def return_aprove_message(
         callback: CallbackQuery,
@@ -144,7 +145,7 @@ async def return_aprove_message(
         logger: Logger,
         gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
 ) -> None:
-    user_chat_id = callback.from_user.id
+    user_chat_id = callback.data.split(";")[1]
     logger.debug(f"Загруженные данные: {user_chat_id}")
     if not user_chat_id:
         logger.debug("Ошибка: ID чата пользователя не найден")
