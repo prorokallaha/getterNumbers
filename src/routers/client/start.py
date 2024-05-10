@@ -62,7 +62,7 @@ async def start_message(
                 logger.error(f"File not found: {commands_response.image_item_id}")
                 await message.answer(text=response_text, reply_markup=keyboard)
         else:
-            await message.answer(text=response_text)
+            await message.answer(text=response_text, reply_markup=keyboard)
     else:
         logger.error("Commands response is None")
         await message.answer(text=f"Здравствуйте {user.username}", reply_markup=keyboard)
