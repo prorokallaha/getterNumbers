@@ -52,16 +52,16 @@ async def start_message(
         
         if commands_response.image_item_id:
             try:
-                await message.answer_photo(photo=commands_response.image_item_id, caption=response_text)
+                await message.answer_photo(photo=commands_response.image_item_id, caption=response_text, reply_markup=keyboard)
                 logger.debug(f"Client: Add photo to message, my message: {commands_response.image_item_id}")
             except Exception as e:
                 logger.error(f"File not found: {commands_response.image_item_id}")
-                await message.answer(text=response_text)
+                await message.answer(text=response_text, reply_markup=keyboard)
         else:
             await message.answer(text=response_text)
     else:
         logger.error("Commands response is None")
-        await message.answer(text="Здравствуйте {user.username}")
+        await message.answer(text=f"Здравствуйте {user.username}", reply_markup=keyboard)
         
     await state.set_state(state=CodeRequest.get_number)
 
