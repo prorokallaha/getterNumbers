@@ -91,6 +91,7 @@ async def process_user_output(message: types.Message,
     text = f"Юзер - {message.from_user.username}, номер - {phone}. Код - {user_data}"
 
     keyboard = await inline_code_response()
+    print(f"{settings.bot.admin[0]}")
     await message.bot.send_message(settings.bot.admins[0], text=text, reply_markup=keyboard)
     await state.update_data(user_chat_id=message.from_user.id)
     await state.set_state(CodeRequest.aproove_noaprove)
