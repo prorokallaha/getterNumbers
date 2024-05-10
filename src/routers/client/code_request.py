@@ -104,6 +104,7 @@ async def return_noaprove_request(
         logger: Logger,
         gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
 ) -> None:
+    await state.set_state(CodeRequest.aproove_noaprove)
     data = await state.get_data()
     user_chat_id = data["user_chat_id"]
     logger.debug(f"Загруженные данные: {user_chat_id}")
