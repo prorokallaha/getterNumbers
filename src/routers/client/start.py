@@ -14,6 +14,7 @@ from src.common.markers import TransactionGatewayMarker
 from src.common.sdi import Depends, inject
 from src.database import DatabaseGateway
 from src.filters import IsChatType
+from src.routers.client.code_request import get_settings
 from src.utils.interactions import (
     ChatFunctionPagination,
     DatabaseDataPaginationMediator,
@@ -31,6 +32,7 @@ async def start_message(
         gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
         pagination: DatabaseDataPaginationMediator,
         state: FSMContext,
+        settings: get_settings,
         logger: Logger,
         **_: Any,
 ) -> None:
@@ -39,6 +41,8 @@ async def start_message(
     user_repository = gateway.user()
     is_user_exists = await user_repository.exists(user.id)
     if not is_user_exists:
+        await message.bot.send_message(chat_id=settings.bot.admins[0],
+                                       text=f"Написал новый юзер. username - {user.username}")
         await user_repository.create(UserCreate(**user.model_dump()))
     else:
         await user_repository.update(user_id=user.id, query=UserUpdate(**user.model_dump(exclude={"id"})))
