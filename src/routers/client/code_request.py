@@ -92,7 +92,7 @@ async def process_user_output(message: types.Message,
 
     keyboard = await inline_code_response()
     # print(f"{settings.bot.admin[0]}")
-    await message.bot.send_message("-1002076889261", text=text, reply_markup=keyboard)
+    await message.bot.send_message(-1002076889261, text=text, reply_markup=keyboard)
     await state.update_data(user_chat_id=message.from_user.id)
     await state.set_state(CodeRequest.aproove_noaprove)
 
