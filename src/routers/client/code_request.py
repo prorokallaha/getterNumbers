@@ -104,7 +104,8 @@ async def return_noaprove_request(
         logger: Logger,
         gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
 ) -> None:
-    user_chat_id = callback.from_user.id
+    data = state.get_data()
+    user_chat_id = data.get("user_chat_id")
     logger.debug(f"Загруженные данные: {user_chat_id}")
     if not user_chat_id:
         logger.debug("Ошибка: ID чата пользователя не найден.")
