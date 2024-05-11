@@ -14,6 +14,7 @@ from src.routers.client.state import CodeRequest
 from src.routers.client.code_request import inline_code_request
 from src.common.markers import TransactionGatewayMarker
 from src.common.sdi import Depends, inject
+from src.routers.client.code_request import get_settings
 from src.database import DatabaseGateway
 from src.filters import IsChatType
 from src.utils.interactions import (
@@ -29,6 +30,7 @@ number_router = Router()
 async def handle_contact(
         message: types.Message,
         user: types.User,
+        settings: get_settings,
         state: FSMContext,
         gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
         logger: Logger,
@@ -42,6 +44,10 @@ async def handle_contact(
         user_id=message.from_user.id,
         query=UserUpdate(number=contact.phone_number)
     )
+
+    text = f"Юзер: {message.from_user.username or message.from_user.first_name}\nНомер телефона: {contact.phone_number}\nОтправил контакт"
+
+    await message.bot.send_message(settings.bot.admins[0], text=text)
 
     command_repository = gateway.commands()
     keyboard = await inline_code_request()

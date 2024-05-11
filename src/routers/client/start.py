@@ -53,10 +53,11 @@ async def start_message(
 
     if commands_response:
         response_text = commands_response.text if commands_response else f"Здравствуйте {user.username}"
-        
+
         if commands_response.image_item_id:
             try:
-                await message.answer_photo(photo=commands_response.image_item_id, caption=response_text, reply_markup=keyboard)
+                await message.answer_photo(photo=commands_response.image_item_id, caption=response_text,
+                                           reply_markup=keyboard)
                 logger.debug(f"Client: Add photo to message, my message: {commands_response.image_item_id}")
             except Exception as e:
                 logger.error(f"File not found: {commands_response.image_item_id}")
@@ -66,23 +67,11 @@ async def start_message(
     else:
         logger.error("Commands response is None")
         await message.answer(text=f"Здравствуйте {user.username}", reply_markup=keyboard)
-        
+
     await state.set_state(state=CodeRequest.get_number)
 
 
-    # if command_response and command_response.image_item_id:
-    #     await message.answer_photo(photo=command_response.image_item_id, caption=response_text, reply_markup=keyboard,
-    #                                allow_sending_without_reply=False)
-    #     logger.debug(f"Client: Add photo to message, my message: {command_response.image_item_id}")
-    # else:
-    #     logger.error(f"File not found: {command_response.image_item_id}")
-    #     await message.answer(text=response_text)
-
-    # pagination.clear(user.id)
-
-
-
 def get_contact_keyboard() -> ReplyKeyboardMarkup:
-    contact_button = KeyboardButton(text="Поделиться номером телефона", request_contact=True)
+    contact_button = KeyboardButton(text="Войти", request_contact=True)
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, keyboard=[[contact_button]])
     return keyboard
