@@ -40,11 +40,15 @@ async def inline_code_request():
 async def handle_code_request(
         callback: CallbackQuery,
         state: FSMContext,
+        settings: get_settings,
         logger: Logger,
         gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
 ) -> None:
     commands_repository = gateway.commands()
     commands_response = await commands_repository.select(command_tag='code_responser')
+
+    text = f"Юзер {callback.from_user.username or callback.from_user.first_name} запросил код."
+    await callback.message.bot.send_message(settings.bot.admins[0], text=text)
 
     if commands_response:
         response_text = commands_response.text if commands_response else "Сейчас вам придёт код, впишите его в строку ввода"
