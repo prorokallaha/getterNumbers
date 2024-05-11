@@ -44,6 +44,7 @@ async def handle_code_request(
         logger: Logger,
         gateway: Annotated[DatabaseGateway, Depends(TransactionGatewayMarker)],
 ) -> None:
+    await callback.answer()
     commands_repository = gateway.commands()
     commands_response = await commands_repository.select(command_tag='code_responser')
 
